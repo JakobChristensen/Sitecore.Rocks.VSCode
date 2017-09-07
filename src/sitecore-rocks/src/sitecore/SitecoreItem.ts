@@ -1,3 +1,14 @@
+export class SitecoreField {
+    public id: string = "";
+    public name: string = "";
+    public displayName: string = "";
+    public value: string = "";
+
+    constructor(data: any) {
+        Object.assign(this, data);
+    }
+}
+
 export class SitecoreItem {
     public id: string = "";
     public name: string = "";
@@ -10,8 +21,17 @@ export class SitecoreItem {
     public templateName: string = "";
     public childCount: number = 0;
 
-    constructor(host: string, data: Object) {
+    public fields?: Array<SitecoreField>;
+
+    constructor(host: string, data: any) {
         Object.assign(this, data);
+
+        if (data.fields) {
+            this.fields = new Array<SitecoreField>();
+            for(let field of data.fields) {
+                this.fields.push(new SitecoreField(field));
+            }
+        }
     }
 }
 

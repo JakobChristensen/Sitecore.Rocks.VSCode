@@ -11,14 +11,8 @@ function activate(context) {
     let provider = new FieldEditorProvider_1.FieldEditorProvider(context.asAbsolutePath("src/"));
     vscode.workspace.registerTextDocumentContentProvider('sitecore-item', provider);
     // commands
-    vscode.commands.registerCommand('extension.sitecore.editItem', (item) => {
-        let previewUri = vscode.Uri.parse('sitecore-item://pathfinder/' + item.database + "/" + item.id);
-        return vscode.commands.executeCommand('vscode.previewHtml', previewUri, undefined, item.name).then((success) => {
-        }, (reason) => {
-            vscode.window.showErrorMessage(reason);
-        });
-    });
-    vscode.commands.registerCommand('extension.sitecore.saveItem', (args) => vscode.window.showInformationMessage("Save Item: " + args.data));
+    vscode.commands.registerCommand('extension.sitecore.editItem', (item) => sitecoreExplorer.editItem(item));
+    vscode.commands.registerCommand('extension.sitecore.saveItem', (args) => sitecoreExplorer.saveItem(args.data));
     vscode.commands.registerCommand('extension.sitecore.addConnection', () => sitecoreExplorer.addConnection());
     vscode.commands.registerCommand('extension.sitecore.removeConnection', (connectionTreeViewItem) => sitecoreExplorer.removeConnection(connectionTreeViewItem));
 }

@@ -55,9 +55,9 @@
                 },
                 {
 					"command": "extension.sitecore.removeConnection",
-					"when": "view == sitecoreExplorer  && viewItem == connection"
+					"when": "view == sitecoreExplorer && viewItem == connection"
 				}
-			]
+            ]
 		}
     },
     "scripts": {

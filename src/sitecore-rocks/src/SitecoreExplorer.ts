@@ -4,6 +4,7 @@ import { SitecoreConnection } from './data/SitecoreConnection';
 import { TreeViewItem } from './SitecoreExplorer/TreeViewItem';
 import { ConnectionTreeViewItem } from './SitecoreExplorer/ConnectionTreeViewItem';
 import * as vscode from 'vscode';
+import { ItemTreeViewItem } from './SitecoreExplorer/ItemTreeViewItem';
 
 export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> {
 
@@ -48,15 +49,21 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
     }
 
     public removeConnection(connectionTreeViewItem: ConnectionTreeViewItem) {
-        var index = this.connections.indexOf(connectionTreeViewItem.connection);
-        if (index < 0) {
-            return;
-        }
+        vscode.window.showWarningMessage("Are you sure, you want to remove the connect?", "OK", "Cancel").then(response => {
+            if (response != "OK") {
+                return;
+            }
 
-        this.connections.splice(index, 1);
+            var index = this.connections.indexOf(connectionTreeViewItem.connection);
+            if (index < 0) {
+                return;
+            }
 
-        this.saveConnections();
-        this._onDidChangeTreeData.fire();
+            this.connections.splice(index, 1);
+
+            this.saveConnections();
+            this._onDidChangeTreeData.fire();
+        });
     }
 
     private saveConnections() {
@@ -81,5 +88,14 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
             const connection = SitecoreConnection.create(data.host, data.userName, data.password);
             this.connections.push(connection);
         }
+    }
+
+    public editItem(item: ItemTreeViewItem) {
+        let previewUri = vscode.Uri.parse('sitecore-item://' + item.itemUri.toString());
+        return vscode.commands.executeCommand('vscode.previewHtml', previewUri, undefined, item.item.displayName).then((success) => { }, (reason) => vscode.window.showErrorMessage(reason));
+    }
+
+    public saveItem(item: any) {
+        console.log(item);
     }
 }

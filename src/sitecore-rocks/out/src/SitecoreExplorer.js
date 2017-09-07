@@ -38,13 +38,18 @@ class SitecoreExplorerProvider {
         });
     }
     removeConnection(connectionTreeViewItem) {
-        var index = this.connections.indexOf(connectionTreeViewItem.connection);
-        if (index < 0) {
-            return;
-        }
-        this.connections.splice(index, 1);
-        this.saveConnections();
-        this._onDidChangeTreeData.fire();
+        vscode.window.showWarningMessage("Are you sure, you want to remove the connect?", "OK", "Cancel").then(response => {
+            if (response != "OK") {
+                return;
+            }
+            var index = this.connections.indexOf(connectionTreeViewItem.connection);
+            if (index < 0) {
+                return;
+            }
+            this.connections.splice(index, 1);
+            this.saveConnections();
+            this._onDidChangeTreeData.fire();
+        });
     }
     saveConnections() {
         let json = new Array();
@@ -63,6 +68,13 @@ class SitecoreExplorerProvider {
             const connection = SitecoreConnection_1.SitecoreConnection.create(data.host, data.userName, data.password);
             this.connections.push(connection);
         }
+    }
+    editItem(item) {
+        let previewUri = vscode.Uri.parse('sitecore-item://' + item.itemUri.toString());
+        return vscode.commands.executeCommand('vscode.previewHtml', previewUri, undefined, item.item.displayName).then((success) => { }, (reason) => vscode.window.showErrorMessage(reason));
+    }
+    saveItem(item) {
+        console.log(item);
     }
 }
 exports.SitecoreExplorerProvider = SitecoreExplorerProvider;

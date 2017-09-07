@@ -4,6 +4,7 @@ import { DatabaseUri } from './DatabaseUri';
 import { ItemUri } from './ItemUri';
 
 export class SitecoreConnection {
+
     private static cache: { [key: string]: SitecoreConnection } = {};
 
     public static readonly empty = new SitecoreConnection('', '', '');
@@ -57,6 +58,17 @@ export class SitecoreConnection {
                     const items = children.map(d => new SitecoreItem(this.host, d));
 
                     completed(items);
+                });
+            });
+        }));
+    }
+
+    public getItem(itemUri: ItemUri): Thenable<SitecoreItem> {
+        return this.connect().then(client => new Promise((completed, error) => {
+            client.get(this.host + '/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?username=' + this.userName + '&password=' + this.password + "&fields=*&fieldinfo=true").then(response => {
+                response.readBody().then(body => {
+                    const data = JSON.parse(body);
+                    completed(new SitecoreItem(this.host, data));
                 });
             });
         }));

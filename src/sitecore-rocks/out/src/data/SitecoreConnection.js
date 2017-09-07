@@ -50,6 +50,16 @@ class SitecoreConnection {
             });
         }));
     }
+    getItem(itemUri) {
+        return this.connect().then(client => new Promise((completed, error) => {
+            client.get(this.host + '/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?username=' + this.userName + '&password=' + this.password + "&fields=*&fieldinfo=true").then(response => {
+                response.readBody().then(body => {
+                    const data = JSON.parse(body);
+                    completed(new SitecoreItem_1.SitecoreItem(this.host, data));
+                });
+            });
+        }));
+    }
 }
 SitecoreConnection.cache = {};
 SitecoreConnection.empty = new SitecoreConnection('', '', '');
