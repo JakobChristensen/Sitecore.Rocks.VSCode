@@ -13,7 +13,8 @@ class DatabaseTreeViewItem extends TreeViewItem_1.TreeViewItem {
         return {
             treeViewItem: this,
             label: this.databaseUri.databaseName,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            contextValue: 'database'
         };
     }
     getChildren() {

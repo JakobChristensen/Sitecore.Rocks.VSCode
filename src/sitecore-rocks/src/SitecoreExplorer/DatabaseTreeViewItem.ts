@@ -16,7 +16,8 @@ export class DatabaseTreeViewItem extends TreeViewItem {
         return {
             treeViewItem: this,
             label: this.databaseUri.databaseName,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            contextValue: 'database'
         }
     }
 

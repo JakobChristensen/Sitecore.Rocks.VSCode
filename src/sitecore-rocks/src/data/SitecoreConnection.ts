@@ -27,7 +27,7 @@ export class SitecoreConnection {
     }
 
 
-    protected constructor(public host: string, private userName: string, private password: string) {
+    protected constructor(public host: string, public userName: string, public password: string) {
     }
 
     public connect(): Thenable<HttpClient> {

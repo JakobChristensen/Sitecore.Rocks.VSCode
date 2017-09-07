@@ -5,7 +5,7 @@ const SitecoreExplorer_1 = require("./SitecoreExplorer");
 const FieldEditorProvider_1 = require("./FieldEditorProvider");
 function activate(context) {
     // sitecore explorer
-    const sitecoreExplorer = new SitecoreExplorer_1.SitecoreExplorerProvider();
+    const sitecoreExplorer = new SitecoreExplorer_1.SitecoreExplorerProvider(context);
     vscode.window.registerTreeDataProvider('sitecoreExplorer', sitecoreExplorer);
     // sitecore field editor
     let provider = new FieldEditorProvider_1.FieldEditorProvider(context.asAbsolutePath("src/"));
@@ -19,6 +19,8 @@ function activate(context) {
         });
     });
     vscode.commands.registerCommand('extension.sitecore.saveItem', (args) => vscode.window.showInformationMessage("Save Item: " + args.data));
+    vscode.commands.registerCommand('extension.sitecore.addConnection', () => sitecoreExplorer.addConnection());
+    vscode.commands.registerCommand('extension.sitecore.removeConnection', (connectionTreeViewItem) => sitecoreExplorer.removeConnection(connectionTreeViewItem));
 }
 exports.activate = activate;
 function deactivate() {

@@ -17,7 +17,8 @@ export class ConnectionTreeViewItem extends TreeViewItem {
         return {
             treeViewItem: this,
             label: this.connection.host,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            contextValue: 'connection'
         }
     }
 

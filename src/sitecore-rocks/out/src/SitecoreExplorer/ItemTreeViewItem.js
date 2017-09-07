@@ -13,7 +13,8 @@ class ItemTreeViewItem extends TreeViewItem_1.TreeViewItem {
         return {
             treeViewItem: this,
             label: this.item.displayName,
-            collapsibleState: this.item.childCount > 0 ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
+            collapsibleState: this.item.childCount > 0 ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
+            contextValue: 'item'
         };
     }
     getChildren() {

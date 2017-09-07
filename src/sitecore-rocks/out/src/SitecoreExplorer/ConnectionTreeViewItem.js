@@ -14,7 +14,8 @@ class ConnectionTreeViewItem extends TreeViewItem_1.TreeViewItem {
         return {
             treeViewItem: this,
             label: this.connection.host,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            contextValue: 'connection'
         };
     }
     getChildren() {
