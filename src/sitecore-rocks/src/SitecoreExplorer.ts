@@ -1,77 +1,30 @@
 import { ExtensionContext, TreeDataProvider, EventEmitter, TreeItem, Event, window, TreeItemCollapsibleState, Uri, commands, workspace, TextDocumentContentProvider, CancellationToken, ProviderResult } from 'vscode';
-import { HttpClient } from 'typed-rest-client/HttpClient';
+import { SitecoreItem } from "./sitecore/SitecoreItem";
+import { SitecoreConnection } from './data/SitecoreConnection';
+import { TreeViewItem } from './SitecoreExplorer/TreeViewItem';
+import { ConnectionTreeViewItem } from './SitecoreExplorer/ConnectionTreeViewItem';
 
-export class SitecoreItem {
-    public id: string = "";
-    public name: string = "";
-    public displayName: string = "";
-    public database: string = "";
-    public icon16x16: string = "";
-    public icon32x32: string = "";
-    public path: string = "";
-    public templateId: string = "";
-    public templateName: string = "";
-    public childCount: number = 0;
-}
-
-export class SitecoreConnection {
-
-    constructor(private host: string, private userName: string, private password: string) {
-    }
-
-    public connect(): Thenable<HttpClient> {
-        return new Promise((c, e) => {
-            const client = new HttpClient('');
-            c(client);
-        });
-    }
-
-    public get roots(): Thenable<SitecoreItem[]> {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/master?username=' + this.userName + '&password=' + this.password).then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    completed([data.root]);
-                });
-            });
-        }));
-    }
-
-    public getChildren(item: SitecoreItem): Thenable<SitecoreItem[]> {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/item/' + item.database + '/' + item.id + '?username=' + this.userName + '&password=' + this.password + '&children=1').then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    completed(data.children);
-                });
-            });
-        }));
-    }
-}
-
-export class SitecoreTreeDataProvider implements TreeDataProvider<SitecoreItem> {
+export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> {
 
     private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
     readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
-    private connection: SitecoreConnection;
+    public connections: Array<SitecoreConnection> = new Array<SitecoreConnection>();
 
-    public getTreeItem(item: SitecoreItem): TreeItem {
-        return {
-            label: item.name,
-            collapsibleState: item.childCount > 0 ? TreeItemCollapsibleState.Collapsed : void 0
-        };
+    constructor() {
+        var connection = SitecoreConnection.create('http://pathfinder', 'sitecore\\admin', 'b');
+        this.connections.push(connection);
     }
 
-    public getChildren(element?: SitecoreItem): SitecoreItem[] | Thenable<SitecoreItem[]> {
-        if (!element) {
-            if (!this.connection) {
-                this.connection = new SitecoreConnection('http://pathfinder', 'sitecore\\admin', 'b');
-            }
+    public getTreeItem(treeViewItem: TreeViewItem): TreeItem {
+        return treeViewItem.getTreeItem();
+    }
 
-            return this.connection.roots;
+    public getChildren(treeViewItem?: TreeViewItem): TreeViewItem[] | Thenable<TreeViewItem[]> {
+        if (!treeViewItem) {
+            return this.connections.map(connection => new ConnectionTreeViewItem(connection));
         }
 
-        return this.connection.getChildren(element);
+        return treeViewItem.getChildren();
     }
 }
