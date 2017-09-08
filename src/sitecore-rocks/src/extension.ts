@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // commands
     vscode.commands.registerCommand('extension.sitecore.editItem', (item: ItemTreeViewItem) => sitecoreExplorer.editItem(item));
-    vscode.commands.registerCommand('extension.sitecore.saveItem', (args: { data: string }) => sitecoreExplorer.saveItem(args.data));
+    vscode.commands.registerCommand('extension.sitecore.saveItem', (args: { data: any }) => sitecoreExplorer.saveItem(new SitecoreItem(args.data, undefined, false)));
     vscode.commands.registerCommand('extension.sitecore.addConnection', () => sitecoreExplorer.addConnection());
     vscode.commands.registerCommand('extension.sitecore.removeConnection', (connectionTreeViewItem: ConnectionTreeViewItem) => sitecoreExplorer.removeConnection(connectionTreeViewItem));
 }

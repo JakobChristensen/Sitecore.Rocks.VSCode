@@ -5,6 +5,8 @@ import { TreeViewItem } from './SitecoreExplorer/TreeViewItem';
 import { ConnectionTreeViewItem } from './SitecoreExplorer/ConnectionTreeViewItem';
 import * as vscode from 'vscode';
 import { ItemTreeViewItem } from './SitecoreExplorer/ItemTreeViewItem';
+import { ItemUri } from './data/ItemUri';
+import { ItemVersionUri } from './data/ItemVersionUri';
 
 export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> {
 
@@ -95,7 +97,8 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         return vscode.commands.executeCommand('vscode.previewHtml', previewUri, undefined, item.item.displayName).then((success) => { }, (reason) => vscode.window.showErrorMessage(reason));
     }
 
-    public saveItem(item: any) {
-        console.log(item);
+    public saveItem(item: SitecoreItem) {
+        let connection = SitecoreConnection.get(item.host);
+        connection.saveItems([item]);
     }
 }

@@ -74,7 +74,8 @@ class SitecoreExplorerProvider {
         return vscode.commands.executeCommand('vscode.previewHtml', previewUri, undefined, item.item.displayName).then((success) => { }, (reason) => vscode.window.showErrorMessage(reason));
     }
     saveItem(item) {
-        console.log(item);
+        let connection = SitecoreConnection_1.SitecoreConnection.get(item.host);
+        connection.saveItems([item]);
     }
 }
 exports.SitecoreExplorerProvider = SitecoreExplorerProvider;
