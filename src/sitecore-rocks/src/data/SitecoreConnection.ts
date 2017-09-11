@@ -32,6 +32,16 @@ export class SitecoreConnection {
     protected constructor(public host: string, public userName: string, public password: string) {
     }
 
+    public addItem(databaseUri: DatabaseUri, path: string, templateId: string, name: string): Thenable<SitecoreItem> {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/put/item/' + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                completed(new SitecoreItem(data.item, this.host));
+            });
+        }));
+    }
+
+
     public getRoot(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
         return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
             response.readBody().then(body => {
@@ -62,6 +72,18 @@ export class SitecoreConnection {
                 });
             })
         );
+    }
+
+    public getTemplates(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/templates/' + databaseUri.databaseName)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const templates = <Array<Object>>data.templates;
+                const items = templates.map(d => new SitecoreItem(d, this.host));
+
+                completed(items);
+            });
+        }));
     }
 
     public saveItems(items: Array<SitecoreItem>): Thenable<void> {

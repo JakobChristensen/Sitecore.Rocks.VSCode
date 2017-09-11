@@ -18,19 +18,23 @@
         "commands": [
             {
                 "command": "extension.sitecore.addConnection",
-                "title": "Sitecore: Add Connection"
+                "title": "Add Connection"
             },
             {
                 "command": "extension.sitecore.removeConnection",
-                "title": "Sitecore: Remove Connection"
+                "title": "Remove Connection"
+            },
+            {
+                "command": "extension.sitecore.addItem",
+                "title": "Add Item"
             },
             {
                 "command": "extension.sitecore.editItem",
-                "title": "Sitecore: Edit Item"
+                "title": "Edit Item"
             },
             {
                 "command": "extension.sitecoreSaveItem",
-                "title": "Sitecore: Save Item"
+                "title": "Save Item"
             }
         ],
         "views": {
@@ -49,6 +53,10 @@
 				}
 			],
 			"view/item/context": [
+				{
+					"command": "extension.sitecore.addItem",
+					"when": "view == sitecoreExplorer && viewItem == item"
+                },
 				{
 					"command": "extension.sitecore.editItem",
 					"when": "view == sitecoreExplorer && viewItem == item"

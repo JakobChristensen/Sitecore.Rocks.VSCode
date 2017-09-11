@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import { ItemTreeViewItem } from './SitecoreExplorer/ItemTreeViewItem';
 import { ItemUri } from './data/ItemUri';
 import { ItemVersionUri } from './data/ItemVersionUri';
+import { QuickPickSitecoreItem } from './UI/QuickPickSitecoreItem';
 
 export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> {
 
@@ -100,5 +101,15 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
     public saveItem(item: SitecoreItem) {
         let connection = SitecoreConnection.get(item.host);
         connection.saveItems([item]);
+    }
+
+    public addItem(parentItem: ItemTreeViewItem) {
+        parentItem.itemUri.websiteUri.connection.getTemplates(parentItem.itemUri.databaseUri).then(templates => {
+            vscode.window.showQuickPick<QuickPickSitecoreItem>(templates.map(t => new QuickPickSitecoreItem(t)), { placeHolder: 'Select template of the new item' }).then(templateItem => {
+                vscode.window.showInputBox({ prompt: 'Enter the name of the new item:', placeHolder: 'http://www.website.com', value: templateItem.item.displayName }).then(newName => {
+                    parentItem.itemUri.websiteUri.connection.addItem(parentItem.itemUri.databaseUri, parentItem.item.path, templateItem.item.id, newName).then(() => this._onDidChangeTreeData.fire(parentItem))
+                });
+            });
+        });
     }
 }

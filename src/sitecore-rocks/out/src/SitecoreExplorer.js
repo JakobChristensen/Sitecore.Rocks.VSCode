@@ -4,6 +4,7 @@ const vscode_1 = require("vscode");
 const SitecoreConnection_1 = require("./data/SitecoreConnection");
 const ConnectionTreeViewItem_1 = require("./SitecoreExplorer/ConnectionTreeViewItem");
 const vscode = require("vscode");
+const QuickPickSitecoreItem_1 = require("./UI/QuickPickSitecoreItem");
 class SitecoreExplorerProvider {
     constructor(context) {
         this.context = context;
@@ -76,6 +77,15 @@ class SitecoreExplorerProvider {
     saveItem(item) {
         let connection = SitecoreConnection_1.SitecoreConnection.get(item.host);
         connection.saveItems([item]);
+    }
+    addItem(parentItem) {
+        parentItem.itemUri.websiteUri.connection.getTemplates(parentItem.itemUri.databaseUri).then(templates => {
+            vscode.window.showQuickPick(templates.map(t => new QuickPickSitecoreItem_1.QuickPickSitecoreItem(t)), { placeHolder: 'Select template of the new item' }).then(templateItem => {
+                vscode.window.showInputBox({ prompt: 'Enter the name of the new item:', placeHolder: 'http://www.website.com', value: templateItem.item.displayName }).then(newName => {
+                    parentItem.itemUri.websiteUri.connection.addItem(parentItem.itemUri.databaseUri, parentItem.item.path, templateItem.item.id, newName).then(() => this._onDidChangeTreeData.fire(parentItem));
+                });
+            });
+        });
     }
 }
 exports.SitecoreExplorerProvider = SitecoreExplorerProvider;

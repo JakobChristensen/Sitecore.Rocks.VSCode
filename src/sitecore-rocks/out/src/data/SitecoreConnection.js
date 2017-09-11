@@ -23,6 +23,14 @@ class SitecoreConnection {
     static clearCache() {
         SitecoreConnection.cache = {};
     }
+    addItem(databaseUri, path, templateId, name) {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/put/item/' + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                completed(new SitecoreItem_1.SitecoreItem(data.item, this.host));
+            });
+        }));
+    }
     getRoot(databaseUri) {
         return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
             response.readBody().then(body => {
@@ -46,6 +54,16 @@ class SitecoreConnection {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem_1.SitecoreItem(data, this.host));
+            });
+        }));
+    }
+    getTemplates(databaseUri) {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/templates/' + databaseUri.databaseName)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const templates = data.templates;
+                const items = templates.map(d => new SitecoreItem_1.SitecoreItem(d, this.host));
+                completed(items);
             });
         }));
     }
