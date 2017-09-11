@@ -112,4 +112,14 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
             });
         });
     }
+
+    public deleteItem(itemTreeViewItem: ItemTreeViewItem) {
+        vscode.window.showWarningMessage(`Are you sure, you want to delete this '${itemTreeViewItem.item.displayName}'?`, "OK", "Cancel").then(response => {
+            if (response != "OK") {
+                return;
+            }
+
+            itemTreeViewItem.itemUri.websiteUri.connection.deleteItem(itemTreeViewItem.itemUri).then(() => this._onDidChangeTreeData.fire(itemTreeViewItem.parent));
+        });
+    }
 }

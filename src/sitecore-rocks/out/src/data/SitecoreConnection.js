@@ -31,6 +31,13 @@ class SitecoreConnection {
             });
         }));
     }
+    deleteItem(itemUri) {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/delete/items/' + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
+            response.readBody().then(body => {
+                completed();
+            });
+        }));
+    }
     getRoot(databaseUri) {
         return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
             response.readBody().then(body => {

@@ -41,6 +41,13 @@ export class SitecoreConnection {
         }));
     }
 
+    public deleteItem(itemUri: ItemUri): Thenable<void> {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/delete/items/' + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
+            response.readBody().then(body => {
+                completed();
+            });
+        }));
+    }
 
     public getRoot(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
         return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
