@@ -9,6 +9,8 @@ export class SitecoreConnection {
 
     public static readonly empty = new SitecoreConnection('', '', '');
 
+    private client: HttpClient = new HttpClient('');
+
     public static create(host: string, userName: string, password: string): SitecoreConnection {
         let connection = SitecoreConnection.cache[host];
         if (!connection) {
@@ -27,64 +29,48 @@ export class SitecoreConnection {
         SitecoreConnection.cache = {};
     }
 
-
     protected constructor(public host: string, public userName: string, public password: string) {
     }
 
-    public connect(): Thenable<HttpClient> {
-        return new Promise((c, e) => {
-            const client = new HttpClient('');
-            c(client);
-        });
-    }
-
     public getRoot(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/' + databaseUri.databaseName + '?username=' + this.userName + '&password=' + this.password).then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    completed([new SitecoreItem(data.root, this.host)]);
-                });
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                completed([new SitecoreItem(data.root, this.host)]);
             });
         }));
     }
 
     public getChildren(itemUri: ItemUri): Thenable<SitecoreItem[]> {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?username=' + this.userName + '&password=' + this.password + '&children=1').then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    const children = <Array<Object>>data.children;
-                    const items = children.map(d => new SitecoreItem(d, this.host));
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?children=1')).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const children = <Array<Object>>data.children;
+                const items = children.map(d => new SitecoreItem(d, this.host));
 
-                    completed(items);
-                });
+                completed(items);
             });
         }));
     }
 
     public getItem(itemUri: ItemUri): Thenable<SitecoreItem> {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?username=' + this.userName + '&password=' + this.password + "&fields=*&fieldinfo=true").then(response => {
+        return new Promise((completed, error) =>
+            this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?fields=*&fieldinfo=true')).then(response => {
                 response.readBody().then(body => {
                     const data = JSON.parse(body);
                     completed(new SitecoreItem(data, this.host));
                 });
-            });
-        }));
+            })
+        );
     }
 
     public saveItems(items: Array<SitecoreItem>): Thenable<void> {
         let data = "";
         let databaseName = "";
-        for(let item of items) {
+        for (let item of items) {
             for (let field of item.fields) {
                 if (field.value !== field.originalValue) {
-                    if (data.length > 0) {
-                        data += "&";
-                    }
-
-                    data += field.uri + "=" + encodeURIComponent(field.value);
+                    data += (data.length > 0 ? '&' : '') + field.uri + "=" + encodeURIComponent(field.value);
                     databaseName = item.database;
                 }
             }
@@ -94,18 +80,24 @@ export class SitecoreConnection {
             return;
         }
 
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.post(this.host + '/sitecore/put/items/' + databaseName + '?username=' + this.userName + '&password=' + this.password, data).then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
+        const headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        };
 
-                    for(let item of items) {
-                        item.saved();
-                    }
+        return new Promise((completed, error) => this.client.post(this.getUrl('/sitecore/put/items/' + databaseName), data, headers).then(response => {
+            response.readBody().then(body => {
+                for (let item of items) {
+                    item.saved();
+                }
 
-                    completed();
-                });
+                completed();
             });
-        }));
+        })
+        );
     }
+
+    private getUrl(url: string) {
+        return this.host + url + (url.indexOf('?') < 0 ? "?" : "&") + 'username=' + encodeURIComponent(this.userName) + '&password=' + encodeURIComponent(this.password);
+    }
+
 }

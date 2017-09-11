@@ -7,6 +7,7 @@ class SitecoreConnection {
         this.host = host;
         this.userName = userName;
         this.password = password;
+        this.client = new HttpClient_1.HttpClient('');
     }
     static create(host, userName, password) {
         let connection = SitecoreConnection.cache[host];
@@ -22,41 +23,29 @@ class SitecoreConnection {
     static clearCache() {
         SitecoreConnection.cache = {};
     }
-    connect() {
-        return new Promise((c, e) => {
-            const client = new HttpClient_1.HttpClient('');
-            c(client);
-        });
-    }
     getRoot(databaseUri) {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/' + databaseUri.databaseName + '?username=' + this.userName + '&password=' + this.password).then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    completed([new SitecoreItem_1.SitecoreItem(data.root, this.host)]);
-                });
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                completed([new SitecoreItem_1.SitecoreItem(data.root, this.host)]);
             });
         }));
     }
     getChildren(itemUri) {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?username=' + this.userName + '&password=' + this.password + '&children=1').then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    const children = data.children;
-                    const items = children.map(d => new SitecoreItem_1.SitecoreItem(d, this.host));
-                    completed(items);
-                });
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?children=1')).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const children = data.children;
+                const items = children.map(d => new SitecoreItem_1.SitecoreItem(d, this.host));
+                completed(items);
             });
         }));
     }
     getItem(itemUri) {
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.get(this.host + '/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?username=' + this.userName + '&password=' + this.password + "&fields=*&fieldinfo=true").then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    completed(new SitecoreItem_1.SitecoreItem(data, this.host));
-                });
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?fields=*&fieldinfo=true')).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                completed(new SitecoreItem_1.SitecoreItem(data, this.host));
             });
         }));
     }
@@ -66,10 +55,7 @@ class SitecoreConnection {
         for (let item of items) {
             for (let field of item.fields) {
                 if (field.value !== field.originalValue) {
-                    if (data.length > 0) {
-                        data += "&";
-                    }
-                    data += field.uri + "=" + encodeURIComponent(field.value);
+                    data += (data.length > 0 ? '&' : '') + field.uri + "=" + encodeURIComponent(field.value);
                     databaseName = item.database;
                 }
             }
@@ -77,17 +63,20 @@ class SitecoreConnection {
         if (!databaseName) {
             return;
         }
-        return this.connect().then(client => new Promise((completed, error) => {
-            client.post(this.host + '/sitecore/put/items/' + databaseName + '?username=' + this.userName + '&password=' + this.password, data).then(response => {
-                response.readBody().then(body => {
-                    const data = JSON.parse(body);
-                    for (let item of items) {
-                        item.saved();
-                    }
-                    completed();
-                });
+        const headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        };
+        return new Promise((completed, error) => this.client.post(this.getUrl('/sitecore/put/items/' + databaseName), data, headers).then(response => {
+            response.readBody().then(body => {
+                for (let item of items) {
+                    item.saved();
+                }
+                completed();
             });
         }));
+    }
+    getUrl(url) {
+        return this.host + url + (url.indexOf('?') < 0 ? "?" : "&") + 'username=' + encodeURIComponent(this.userName) + '&password=' + encodeURIComponent(this.password);
     }
 }
 SitecoreConnection.cache = {};
