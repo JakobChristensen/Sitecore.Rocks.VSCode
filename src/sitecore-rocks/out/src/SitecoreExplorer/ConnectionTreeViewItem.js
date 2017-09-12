@@ -20,11 +20,11 @@ class ConnectionTreeViewItem extends TreeViewItem_1.TreeViewItem {
     }
     getChildren() {
         const websiteUri = WebsiteUri_1.WebsiteUri.createFromConnection(this.connection);
-        let items = new Array();
-        items.push(new DatabaseTreeViewItem_1.DatabaseTreeViewItem(this, DatabaseUri_1.DatabaseUri.create(websiteUri, 'core')));
-        items.push(new DatabaseTreeViewItem_1.DatabaseTreeViewItem(this, DatabaseUri_1.DatabaseUri.create(websiteUri, 'master')));
-        items.push(new DatabaseTreeViewItem_1.DatabaseTreeViewItem(this, DatabaseUri_1.DatabaseUri.create(websiteUri, 'web')));
-        return items;
+        return new Promise((completed, error) => {
+            this.connection.getDatabases(websiteUri).then(databases => {
+                completed(databases.map(database => new DatabaseTreeViewItem_1.DatabaseTreeViewItem(this, DatabaseUri_1.DatabaseUri.create(websiteUri, database.name))));
+            });
+        });
     }
 }
 exports.ConnectionTreeViewItem = ConnectionTreeViewItem;

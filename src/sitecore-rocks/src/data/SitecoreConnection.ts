@@ -2,6 +2,7 @@ import { HttpClient } from 'typed-rest-client/HttpClient';
 import { SitecoreItem } from "../sitecore/SitecoreItem";
 import { DatabaseUri } from './DatabaseUri';
 import { ItemUri } from './ItemUri';
+import { WebsiteUri } from './WebsiteUri';
 
 export class SitecoreConnection {
 
@@ -49,15 +50,6 @@ export class SitecoreConnection {
         }));
     }
 
-    public getRoot(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
-            response.readBody().then(body => {
-                const data = JSON.parse(body);
-                completed([new SitecoreItem(data.root, this.host)]);
-            });
-        }));
-    }
-
     public getChildren(itemUri: ItemUri): Thenable<SitecoreItem[]> {
         return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?children=1')).then(response => {
             response.readBody().then(body => {
@@ -66,6 +58,15 @@ export class SitecoreConnection {
                 const items = children.map(d => new SitecoreItem(d, this.host));
 
                 completed(items);
+            });
+        }));
+    }
+
+    public getDatabases(websiteUri: WebsiteUri): Thenable<{name: string}[]> {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/databases')).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                completed(data.databases);
             });
         }));
     }
@@ -79,6 +80,18 @@ export class SitecoreConnection {
                 });
             })
         );
+    }
+
+    public getRoots(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const children = <Array<Object>>data.roots;
+                const items = children.map(d => new SitecoreItem(d, this.host));
+
+                completed(items);
+            });
+        }));
     }
 
     public getTemplates(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {

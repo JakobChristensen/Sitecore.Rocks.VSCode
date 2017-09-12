@@ -25,13 +25,11 @@ export class ConnectionTreeViewItem extends TreeViewItem {
     public getChildren(): TreeViewItem[] | Thenable<TreeViewItem[]> {
         const websiteUri = WebsiteUri.createFromConnection(this.connection);
 
-        let items = new Array<TreeViewItem>();
-
-        items.push(new DatabaseTreeViewItem(this, DatabaseUri.create(websiteUri, 'core')));
-        items.push(new DatabaseTreeViewItem(this, DatabaseUri.create(websiteUri, 'master')));
-        items.push(new DatabaseTreeViewItem(this, DatabaseUri.create(websiteUri, 'web')));
-
-        return items;
+        return new Promise<TreeViewItem[]>((completed, error) => {
+            this.connection.getDatabases(websiteUri).then(databases => {
+                completed(databases.map(database => new DatabaseTreeViewItem(this, DatabaseUri.create(websiteUri, database.name))));
+            })
+        });
     }
 }
 

@@ -122,4 +122,8 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
             itemTreeViewItem.itemUri.websiteUri.connection.deleteItem(itemTreeViewItem.itemUri).then(() => this._onDidChangeTreeData.fire(itemTreeViewItem.parent));
         });
     }
+
+    public refresh(treeViewItem: TreeViewItem) {
+        this._onDidChangeTreeData.fire(treeViewItem);
+    }
 }

@@ -19,7 +19,7 @@ class DatabaseTreeViewItem extends TreeViewItem_1.TreeViewItem {
     }
     getChildren() {
         return new Promise((completed, error) => {
-            this.databaseUri.websiteUri.connection.getRoot(this.databaseUri).then(items => {
+            this.databaseUri.websiteUri.connection.getRoots(this.databaseUri).then(items => {
                 completed(items.map(item => new ItemTreeViewItem_1.ItemTreeViewItem(this, ItemUri_1.ItemUri.create(this.databaseUri, item.id), item)));
             });
         });

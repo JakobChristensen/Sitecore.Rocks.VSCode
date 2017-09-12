@@ -95,6 +95,9 @@ class SitecoreExplorerProvider {
             itemTreeViewItem.itemUri.websiteUri.connection.deleteItem(itemTreeViewItem.itemUri).then(() => this._onDidChangeTreeData.fire(itemTreeViewItem.parent));
         });
     }
+    refresh(treeViewItem) {
+        this._onDidChangeTreeData.fire(treeViewItem);
+    }
 }
 exports.SitecoreExplorerProvider = SitecoreExplorerProvider;
 //# sourceMappingURL=SitecoreExplorer.js.map

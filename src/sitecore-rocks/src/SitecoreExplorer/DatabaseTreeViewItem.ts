@@ -23,7 +23,7 @@ export class DatabaseTreeViewItem extends TreeViewItem {
 
     public getChildren(): TreeViewItem[] | Thenable<TreeViewItem[]> {
         return new Promise<TreeViewItem[]>((completed, error) => {
-            this.databaseUri.websiteUri.connection.getRoot(this.databaseUri).then(items => {
+            this.databaseUri.websiteUri.connection.getRoots(this.databaseUri).then(items => {
                 completed(items.map(item => new ItemTreeViewItem(this, ItemUri.create(this.databaseUri, item.id), item)));
             })
         });

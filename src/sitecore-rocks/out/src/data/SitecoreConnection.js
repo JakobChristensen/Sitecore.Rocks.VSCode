@@ -38,14 +38,6 @@ class SitecoreConnection {
             });
         }));
     }
-    getRoot(databaseUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
-            response.readBody().then(body => {
-                const data = JSON.parse(body);
-                completed([new SitecoreItem_1.SitecoreItem(data.root, this.host)]);
-            });
-        }));
-    }
     getChildren(itemUri) {
         return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?children=1')).then(response => {
             response.readBody().then(body => {
@@ -56,11 +48,29 @@ class SitecoreConnection {
             });
         }));
     }
+    getDatabases(websiteUri) {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/databases')).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                completed(data.databases);
+            });
+        }));
+    }
     getItem(itemUri) {
         return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?fields=*&fieldinfo=true')).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem_1.SitecoreItem(data, this.host));
+            });
+        }));
+    }
+    getRoots(databaseUri) {
+        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const children = data.roots;
+                const items = children.map(d => new SitecoreItem_1.SitecoreItem(d, this.host));
+                completed(items);
             });
         }));
     }

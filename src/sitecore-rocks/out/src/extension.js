@@ -12,12 +12,13 @@ function activate(context) {
     let provider = new FieldEditorProvider_1.FieldEditorProvider(context.asAbsolutePath("src/"));
     vscode.workspace.registerTextDocumentContentProvider('sitecore-item', provider);
     // commands
+    vscode.commands.registerCommand('extension.sitecore.addConnection', () => sitecoreExplorer.addConnection());
     vscode.commands.registerCommand('extension.sitecore.addItem', (item) => sitecoreExplorer.addItem(item));
     vscode.commands.registerCommand('extension.sitecore.deleteItem', (item) => sitecoreExplorer.deleteItem(item));
     vscode.commands.registerCommand('extension.sitecore.editItem', (item) => sitecoreExplorer.editItem(item));
-    vscode.commands.registerCommand('extension.sitecore.saveItem', (args) => sitecoreExplorer.saveItem(new SitecoreItem_1.SitecoreItem(args.data, undefined, false)));
-    vscode.commands.registerCommand('extension.sitecore.addConnection', () => sitecoreExplorer.addConnection());
+    vscode.commands.registerCommand('extension.sitecore.refresh', (item) => sitecoreExplorer.refresh(item));
     vscode.commands.registerCommand('extension.sitecore.removeConnection', (connectionTreeViewItem) => sitecoreExplorer.removeConnection(connectionTreeViewItem));
+    vscode.commands.registerCommand('extension.sitecore.saveItem', (args) => sitecoreExplorer.saveItem(new SitecoreItem_1.SitecoreItem(args.data, undefined, false)));
 }
 exports.activate = activate;
 function deactivate() {

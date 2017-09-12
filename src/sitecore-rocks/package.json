@@ -39,6 +39,10 @@
             {
                 "command": "extension.sitecoreSaveItem",
                 "title": "Sitecore: Save"
+            },
+            {
+                "command": "extension.sitecore.refresh",
+                "title": "Sitecore: Refresh"
             }
         ],
         "views": {
@@ -69,6 +73,18 @@
 					"command": "extension.sitecore.editItem",
 					"when": "view == sitecoreExplorer && viewItem == item"
                 },
+                {
+					"command": "extension.sitecore.refresh",
+					"when": "view == sitecoreExplorer && viewItem == item"
+				},
+                {
+					"command": "extension.sitecore.refresh",
+					"when": "view == sitecoreExplorer && viewItem == database"
+				},
+                {
+					"command": "extension.sitecore.refresh",
+					"when": "view == sitecoreExplorer && viewItem == connection"
+				},
                 {
 					"command": "extension.sitecore.removeConnection",
 					"when": "view == sitecoreExplorer && viewItem == connection"
