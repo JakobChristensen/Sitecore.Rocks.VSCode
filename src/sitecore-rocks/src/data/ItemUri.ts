@@ -1,14 +1,12 @@
-import { DatabaseUri } from './DatabaseUri';
-import { isString } from './helpers';
-import { WebsiteUri } from './WebsiteUri';
+import { DatabaseUri } from "./DatabaseUri";
+import { isString } from "./helpers";
+import { WebsiteUri } from "./WebsiteUri";
 
 export class ItemUri {
-    private static cache: { [key: string]: ItemUri } = {};
-
-    public static readonly empty = new ItemUri(DatabaseUri.empty, '{00000000-0000-0000-0000-000000000000}');
+    public static readonly empty = new ItemUri(DatabaseUri.empty, "{00000000-0000-0000-0000-000000000000}");
 
     public static create(databaseUri: DatabaseUri , id: string): ItemUri {
-        const key = databaseUri.toString() + '/' + id;
+        const key = databaseUri.toString() + "/" + id;
 
         let itemUri = ItemUri.cache[key];
         if (!itemUri) {
@@ -29,9 +27,9 @@ export class ItemUri {
         }
 
         if (isString(s)) {
-            const n = s.lastIndexOf('/');
+            const n = s.lastIndexOf("/");
             if (n < 0) {
-                throw 'Invalid ItemUri: ' + s;
+                throw new Error("Invalid ItemUri: " + s);
             }
 
             const databaseUri = s.substr(0, n);
@@ -44,8 +42,10 @@ export class ItemUri {
             return ItemUri.create(DatabaseUri.create(WebsiteUri.create(s.host), s.databaseName), s.id);
         }
 
-        throw 'Invalid ItemUri: ' + s;
+        throw new Error("Invalid ItemUri: " + s);
     }
+
+    private static cache: { [key: string]: ItemUri } = {};
 
     protected constructor(public readonly databaseUri: DatabaseUri, public readonly id: string) {
     }
@@ -59,7 +59,7 @@ export class ItemUri {
     }
 
     public toString() {
-        return this.databaseUri.toString() + '/' + this.id;
+        return this.databaseUri.toString() + "/" + this.id;
     }
 }
 

@@ -1,14 +1,13 @@
-import { isString } from './helpers';
-import { DatabaseUri } from './DatabaseUri';
-import { ItemUri } from './ItemUri';
-import { WebsiteUri } from './WebsiteUri';
+import { DatabaseUri } from "./DatabaseUri";
+import { isString } from "./helpers";
+import { ItemUri } from "./ItemUri";
+import { WebsiteUri } from "./WebsiteUri";
 
 export class ItemVersionUri {
-    private static cache: { [key: string]: ItemVersionUri } = {};
-    public static readonly empty = new ItemVersionUri(ItemUri.empty, '', 0);
+    public static readonly empty = new ItemVersionUri(ItemUri.empty, "", 0);
 
     public static create(itemUri: ItemUri, language: string, version: number): ItemVersionUri {
-        const key = itemUri.toString() + '/' + language + '/' + version;
+        const key = itemUri.toString() + "/" + language + "/" + version;
 
         let itemVersionUri = ItemVersionUri.cache[key];
         if (!itemVersionUri) {
@@ -29,10 +28,10 @@ export class ItemVersionUri {
         }
 
         if (isString(s)) {
-            const n = s.lastIndexOf('/');
-            const o = s.lastIndexOf('/', n - 1);
+            const n = s.lastIndexOf("/");
+            const o = s.lastIndexOf("/", n - 1);
             if (n < 0 || o < 0) {
-                throw 'Invalid ItemVersionUri: ' + s;
+                throw new Error("Invalid ItemVersionUri: " + s);
             }
 
             const itemUri = s.substr(0, o);
@@ -47,8 +46,10 @@ export class ItemVersionUri {
         }
 
         console.log(new Error().stack);
-        throw new Error('Invalid ItemVersionUri: ' + s);
+        throw new Error("Invalid ItemVersionUri: " + s);
     }
+
+    private static cache: { [key: string]: ItemVersionUri } = {};
 
     protected constructor(public readonly itemUri: ItemUri, public readonly language: string, public readonly version: number) {
     }
@@ -62,7 +63,7 @@ export class ItemVersionUri {
     }
 
     public toString() {
-        return this.itemUri.toString() + '/' + this.language + '/' + (this.version === -1 ? '-' : this.version);
+        return this.itemUri.toString() + "/" + this.language + "/" + (this.version === -1 ? "-" : this.version);
     }
 }
 

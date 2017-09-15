@@ -9,7 +9,7 @@ class ItemUri {
         this.id = id;
     }
     static create(databaseUri, id) {
-        const key = databaseUri.toString() + '/' + id;
+        const key = databaseUri.toString() + "/" + id;
         let itemUri = ItemUri.cache[key];
         if (!itemUri) {
             itemUri = new ItemUri(databaseUri, id);
@@ -25,9 +25,9 @@ class ItemUri {
             return s;
         }
         if (helpers_1.isString(s)) {
-            const n = s.lastIndexOf('/');
+            const n = s.lastIndexOf("/");
             if (n < 0) {
-                throw 'Invalid ItemUri: ' + s;
+                throw new Error("Invalid ItemUri: " + s);
             }
             const databaseUri = s.substr(0, n);
             const id = s.substr(n + 1);
@@ -36,7 +36,7 @@ class ItemUri {
         if (s.host && s.databaseName && s.id) {
             return ItemUri.create(DatabaseUri_1.DatabaseUri.create(WebsiteUri_1.WebsiteUri.create(s.host), s.databaseName), s.id);
         }
-        throw 'Invalid ItemUri: ' + s;
+        throw new Error("Invalid ItemUri: " + s);
     }
     get websiteUri() {
         return this.databaseUri.websiteUri;
@@ -45,11 +45,11 @@ class ItemUri {
         return this.databaseUri.equals(itemUri.databaseUri) && itemUri.id === this.id;
     }
     toString() {
-        return this.databaseUri.toString() + '/' + this.id;
+        return this.databaseUri.toString() + "/" + this.id;
     }
 }
+ItemUri.empty = new ItemUri(DatabaseUri_1.DatabaseUri.empty, "{00000000-0000-0000-0000-000000000000}");
 ItemUri.cache = {};
-ItemUri.empty = new ItemUri(DatabaseUri_1.DatabaseUri.empty, '{00000000-0000-0000-0000-000000000000}');
 exports.ItemUri = ItemUri;
 function isItemUri(a) {
     return a instanceof ItemUri;

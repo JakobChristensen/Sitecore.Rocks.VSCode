@@ -7,7 +7,7 @@ class SitecoreConnection {
         this.host = host;
         this.userName = userName;
         this.password = password;
-        this.client = new HttpClient_1.HttpClient('');
+        this.client = new HttpClient_1.HttpClient("");
     }
     static create(host, userName, password) {
         let connection = SitecoreConnection.cache[host];
@@ -24,7 +24,7 @@ class SitecoreConnection {
         SitecoreConnection.cache = {};
     }
     addItem(databaseUri, path, templateId, name) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/put/item/' + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/put/item/" + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem_1.SitecoreItem(data.item, this.host));
@@ -32,14 +32,14 @@ class SitecoreConnection {
         }));
     }
     deleteItem(itemUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/delete/items/' + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/delete/items/" + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
             response.readBody().then(body => {
                 completed();
             });
         }));
     }
     getChildren(itemUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?children=1')).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?children=1")).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 const children = data.children;
@@ -49,7 +49,7 @@ class SitecoreConnection {
         }));
     }
     getDatabases(websiteUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/databases')).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/databases")).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(data.databases);
@@ -57,7 +57,7 @@ class SitecoreConnection {
         }));
     }
     getItem(itemUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?fields=*&fieldinfo=true')).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true")).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem_1.SitecoreItem(data, this.host));
@@ -65,7 +65,7 @@ class SitecoreConnection {
         }));
     }
     getRoots(databaseUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/" + databaseUri.databaseName)).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 const children = data.roots;
@@ -75,7 +75,7 @@ class SitecoreConnection {
         }));
     }
     getTemplates(databaseUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/templates/' + databaseUri.databaseName)).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/templates/" + databaseUri.databaseName)).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 const templates = data.templates;
@@ -87,10 +87,10 @@ class SitecoreConnection {
     saveItems(items) {
         let data = "";
         let databaseName = "";
-        for (let item of items) {
-            for (let field of item.fields) {
+        for (const item of items) {
+            for (const field of item.fields) {
                 if (field.value !== field.originalValue) {
-                    data += (data.length > 0 ? '&' : '') + field.uri + "=" + encodeURIComponent(field.value);
+                    data += (data.length > 0 ? "&" : "") + field.uri + "=" + encodeURIComponent(field.value);
                     databaseName = item.database;
                 }
             }
@@ -99,11 +99,11 @@ class SitecoreConnection {
             return;
         }
         const headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            "Content-Type": "application/x-www-form-urlencoded",
         };
-        return new Promise((completed, error) => this.client.post(this.getUrl('/sitecore/put/items/' + databaseName), data, headers).then(response => {
+        return new Promise((completed, error) => this.client.post(this.getUrl("/sitecore/put/items/" + databaseName), data, headers).then(response => {
             response.readBody().then(body => {
-                for (let item of items) {
+                for (const item of items) {
                     item.saved();
                 }
                 completed();
@@ -111,10 +111,10 @@ class SitecoreConnection {
         }));
     }
     getUrl(url) {
-        return this.host + url + (url.indexOf('?') < 0 ? "?" : "&") + 'username=' + encodeURIComponent(this.userName) + '&password=' + encodeURIComponent(this.password);
+        return this.host + url + (url.indexOf("?") < 0 ? "?" : "&") + "username=" + encodeURIComponent(this.userName) + "&password=" + encodeURIComponent(this.password);
     }
 }
+SitecoreConnection.empty = new SitecoreConnection("", "", "");
 SitecoreConnection.cache = {};
-SitecoreConnection.empty = new SitecoreConnection('', '', '');
 exports.SitecoreConnection = SitecoreConnection;
 //# sourceMappingURL=SitecoreConnection.js.map

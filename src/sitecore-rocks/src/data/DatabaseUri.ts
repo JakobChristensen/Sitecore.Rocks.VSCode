@@ -1,13 +1,11 @@
-import { isString } from './helpers';
-import { WebsiteUri } from './WebsiteUri';
+import { isString } from "./helpers";
+import { WebsiteUri } from "./WebsiteUri";
 
 export class DatabaseUri {
-    private static cache: { [key: string]: DatabaseUri } = {};
+    public static readonly empty = new DatabaseUri(WebsiteUri.empty, "");
 
-    public static readonly empty = new DatabaseUri(WebsiteUri.empty, '');
-
-    public static create(websiteUri: WebsiteUri, databaseName: string): DatabaseUri {
-        const key = websiteUri.toString() + '/' + databaseName;
+      public static create(websiteUri: WebsiteUri, databaseName: string): DatabaseUri {
+        const key = websiteUri.toString() + "/" + databaseName;
 
         let databaseUri = DatabaseUri.cache[key];
 
@@ -29,9 +27,9 @@ export class DatabaseUri {
         }
 
         if (isString(s)) {
-            const n = s.lastIndexOf('/');
+            const n = s.lastIndexOf("/");
             if (n < 0) {
-                throw 'Invalid DatabaseUri: ' + s;
+                throw new Error("Invalid DatabaseUri: " + s);
             }
 
             const host = s.substr(0, n);
@@ -44,8 +42,10 @@ export class DatabaseUri {
             return DatabaseUri.create(WebsiteUri.create(s.host), s.databaseName);
         }
 
-        throw 'Invalid DatabaseUri: ' + s;
+        throw new Error("Invalid DatabaseUri: " + s);
     }
+
+    private static cache: { [key: string]: DatabaseUri } = {};
 
     protected constructor(public readonly websiteUri: WebsiteUri, public readonly databaseName: string) {
     }
@@ -55,7 +55,7 @@ export class DatabaseUri {
     }
 
     public toString() {
-        return this.websiteUri.toString() + '/' + this.databaseName;
+        return this.websiteUri.toString() + "/" + this.databaseName;
     }
 }
 

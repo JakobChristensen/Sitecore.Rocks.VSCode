@@ -1,16 +1,12 @@
-import { HttpClient } from 'typed-rest-client/HttpClient';
+import { HttpClient } from "typed-rest-client/HttpClient";
 import { SitecoreItem } from "../sitecore/SitecoreItem";
-import { DatabaseUri } from './DatabaseUri';
-import { ItemUri } from './ItemUri';
-import { WebsiteUri } from './WebsiteUri';
+import { DatabaseUri } from "./DatabaseUri";
+import { ItemUri } from "./ItemUri";
+import { WebsiteUri } from "./WebsiteUri";
 
 export class SitecoreConnection {
 
-    private static cache: { [key: string]: SitecoreConnection } = {};
-
-    public static readonly empty = new SitecoreConnection('', '', '');
-
-    private client: HttpClient = new HttpClient('');
+    public static readonly empty = new SitecoreConnection("", "", "");
 
     public static create(host: string, userName: string, password: string): SitecoreConnection {
         let connection = SitecoreConnection.cache[host];
@@ -30,11 +26,15 @@ export class SitecoreConnection {
         SitecoreConnection.cache = {};
     }
 
+    private static cache: { [key: string]: SitecoreConnection } = {};
+
+    private client: HttpClient = new HttpClient("");
+
     protected constructor(public host: string, public userName: string, public password: string) {
     }
 
     public addItem(databaseUri: DatabaseUri, path: string, templateId: string, name: string): Thenable<SitecoreItem> {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/put/item/' + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/put/item/" + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem(data.item, this.host));
@@ -43,7 +43,7 @@ export class SitecoreConnection {
     }
 
     public deleteItem(itemUri: ItemUri): Thenable<void> {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/delete/items/' + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/delete/items/" + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
             response.readBody().then(body => {
                 completed();
             });
@@ -51,10 +51,10 @@ export class SitecoreConnection {
     }
 
     public getChildren(itemUri: ItemUri): Thenable<SitecoreItem[]> {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?children=1')).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?children=1")).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
-                const children = <Array<Object>>data.children;
+                const children = data.children as object[];
                 const items = children.map(d => new SitecoreItem(d, this.host));
 
                 completed(items);
@@ -62,8 +62,8 @@ export class SitecoreConnection {
         }));
     }
 
-    public getDatabases(websiteUri: WebsiteUri): Thenable<{name: string}[]> {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/databases')).then(response => {
+    public getDatabases(websiteUri: WebsiteUri): Thenable<Array<{ name: string }>> {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/databases")).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(data.databases);
@@ -73,20 +73,19 @@ export class SitecoreConnection {
 
     public getItem(itemUri: ItemUri): Thenable<SitecoreItem> {
         return new Promise((completed, error) =>
-            this.client.get(this.getUrl('/sitecore/get/item/' + itemUri.databaseUri.databaseName + '/' + itemUri.id + '?fields=*&fieldinfo=true')).then(response => {
+            this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true")).then(response => {
                 response.readBody().then(body => {
                     const data = JSON.parse(body);
                     completed(new SitecoreItem(data, this.host));
                 });
-            })
-        );
+            }));
     }
 
     public getRoots(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/' + databaseUri.databaseName)).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/" + databaseUri.databaseName)).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
-                const children = <Array<Object>>data.roots;
+                const children = data.roots as object[];
                 const items = children.map(d => new SitecoreItem(d, this.host));
 
                 completed(items);
@@ -95,10 +94,10 @@ export class SitecoreConnection {
     }
 
     public getTemplates(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
-        return new Promise((completed, error) => this.client.get(this.getUrl('/sitecore/get/templates/' + databaseUri.databaseName)).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/templates/" + databaseUri.databaseName)).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
-                const templates = <Array<Object>>data.templates;
+                const templates = data.templates as object[];
                 const items = templates.map(d => new SitecoreItem(d, this.host));
 
                 completed(items);
@@ -106,13 +105,13 @@ export class SitecoreConnection {
         }));
     }
 
-    public saveItems(items: Array<SitecoreItem>): Thenable<void> {
+    public saveItems(items: SitecoreItem[]): Thenable<void> {
         let data = "";
         let databaseName = "";
-        for (let item of items) {
-            for (let field of item.fields) {
+        for (const item of items) {
+            for (const field of item.fields) {
                 if (field.value !== field.originalValue) {
-                    data += (data.length > 0 ? '&' : '') + field.uri + "=" + encodeURIComponent(field.value);
+                    data += (data.length > 0 ? "&" : "") + field.uri + "=" + encodeURIComponent(field.value);
                     databaseName = item.database;
                 }
             }
@@ -123,23 +122,22 @@ export class SitecoreConnection {
         }
 
         const headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            "Content-Type": "application/x-www-form-urlencoded",
         };
 
-        return new Promise((completed, error) => this.client.post(this.getUrl('/sitecore/put/items/' + databaseName), data, headers).then(response => {
+        return new Promise((completed, error) => this.client.post(this.getUrl("/sitecore/put/items/" + databaseName), data, headers).then(response => {
             response.readBody().then(body => {
-                for (let item of items) {
+                for (const item of items) {
                     item.saved();
                 }
 
                 completed();
             });
-        })
-        );
+        }));
     }
 
     private getUrl(url: string) {
-        return this.host + url + (url.indexOf('?') < 0 ? "?" : "&") + 'username=' + encodeURIComponent(this.userName) + '&password=' + encodeURIComponent(this.password);
+        return this.host + url + (url.indexOf("?") < 0 ? "?" : "&") + "username=" + encodeURIComponent(this.userName) + "&password=" + encodeURIComponent(this.password);
     }
 
 }

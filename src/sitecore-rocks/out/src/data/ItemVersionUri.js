@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const helpers_1 = require("./helpers");
 const DatabaseUri_1 = require("./DatabaseUri");
+const helpers_1 = require("./helpers");
 const ItemUri_1 = require("./ItemUri");
 const WebsiteUri_1 = require("./WebsiteUri");
 class ItemVersionUri {
@@ -11,7 +11,7 @@ class ItemVersionUri {
         this.version = version;
     }
     static create(itemUri, language, version) {
-        const key = itemUri.toString() + '/' + language + '/' + version;
+        const key = itemUri.toString() + "/" + language + "/" + version;
         let itemVersionUri = ItemVersionUri.cache[key];
         if (!itemVersionUri) {
             itemVersionUri = new ItemVersionUri(itemUri, language, version);
@@ -27,10 +27,10 @@ class ItemVersionUri {
             return s;
         }
         if (helpers_1.isString(s)) {
-            const n = s.lastIndexOf('/');
-            const o = s.lastIndexOf('/', n - 1);
+            const n = s.lastIndexOf("/");
+            const o = s.lastIndexOf("/", n - 1);
             if (n < 0 || o < 0) {
-                throw 'Invalid ItemVersionUri: ' + s;
+                throw new Error("Invalid ItemVersionUri: " + s);
             }
             const itemUri = s.substr(0, o);
             const language = s.substring(o + 1, n);
@@ -41,7 +41,7 @@ class ItemVersionUri {
             return ItemVersionUri.create(ItemUri_1.ItemUri.create(DatabaseUri_1.DatabaseUri.create(WebsiteUri_1.WebsiteUri.create(s.host), s.databaseName), s.id), s.language, s.version);
         }
         console.log(new Error().stack);
-        throw new Error('Invalid ItemVersionUri: ' + s);
+        throw new Error("Invalid ItemVersionUri: " + s);
     }
     get databaseUri() {
         return this.itemUri.databaseUri;
@@ -50,11 +50,11 @@ class ItemVersionUri {
         return this.itemUri.equals(itemVersionUri.itemUri) && itemVersionUri.language === this.language && itemVersionUri.version === this.version;
     }
     toString() {
-        return this.itemUri.toString() + '/' + this.language + '/' + (this.version === -1 ? '-' : this.version);
+        return this.itemUri.toString() + "/" + this.language + "/" + (this.version === -1 ? "-" : this.version);
     }
 }
+ItemVersionUri.empty = new ItemVersionUri(ItemUri_1.ItemUri.empty, "", 0);
 ItemVersionUri.cache = {};
-ItemVersionUri.empty = new ItemVersionUri(ItemUri_1.ItemUri.empty, '', 0);
 exports.ItemVersionUri = ItemVersionUri;
 function isItemVersionUri(a) {
     return a instanceof ItemVersionUri;

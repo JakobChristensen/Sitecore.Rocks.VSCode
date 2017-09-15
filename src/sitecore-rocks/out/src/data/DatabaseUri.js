@@ -8,7 +8,7 @@ class DatabaseUri {
         this.databaseName = databaseName;
     }
     static create(websiteUri, databaseName) {
-        const key = websiteUri.toString() + '/' + databaseName;
+        const key = websiteUri.toString() + "/" + databaseName;
         let databaseUri = DatabaseUri.cache[key];
         if (!databaseUri) {
             databaseUri = new DatabaseUri(websiteUri, databaseName);
@@ -24,9 +24,9 @@ class DatabaseUri {
             return s;
         }
         if (helpers_1.isString(s)) {
-            const n = s.lastIndexOf('/');
+            const n = s.lastIndexOf("/");
             if (n < 0) {
-                throw 'Invalid DatabaseUri: ' + s;
+                throw new Error("Invalid DatabaseUri: " + s);
             }
             const host = s.substr(0, n);
             const databaseName = s.substr(n + 1);
@@ -35,17 +35,17 @@ class DatabaseUri {
         if (s.databaseName) {
             return DatabaseUri.create(WebsiteUri_1.WebsiteUri.create(s.host), s.databaseName);
         }
-        throw 'Invalid DatabaseUri: ' + s;
+        throw new Error("Invalid DatabaseUri: " + s);
     }
     equals(databaseUri) {
         return databaseUri.databaseName === this.databaseName;
     }
     toString() {
-        return this.websiteUri.toString() + '/' + this.databaseName;
+        return this.websiteUri.toString() + "/" + this.databaseName;
     }
 }
+DatabaseUri.empty = new DatabaseUri(WebsiteUri_1.WebsiteUri.empty, "");
 DatabaseUri.cache = {};
-DatabaseUri.empty = new DatabaseUri(WebsiteUri_1.WebsiteUri.empty, '');
 exports.DatabaseUri = DatabaseUri;
 function isDatabaseUri(a) {
     return a instanceof DatabaseUri;

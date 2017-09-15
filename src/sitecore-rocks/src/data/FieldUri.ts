@@ -1,16 +1,14 @@
-import { isString } from './helpers';
-import { ItemVersionUri } from './ItemVersionUri';
-import { DatabaseUri } from './DatabaseUri';
-import { ItemUri } from './ItemUri';
-import { WebsiteUri } from './WebsiteUri';
+import { DatabaseUri } from "./DatabaseUri";
+import { isString } from "./helpers";
+import { ItemUri } from "./ItemUri";
+import { ItemVersionUri } from "./ItemVersionUri";
+import { WebsiteUri } from "./WebsiteUri";
 
 export class FieldUri {
-    private static cache: { [key: string]: FieldUri } = {};
-
-    public static readonly empty = new FieldUri(ItemVersionUri.empty, '{00000000-0000-0000-0000-000000000000}');
+    public static readonly empty = new FieldUri(ItemVersionUri.empty, "{00000000-0000-0000-0000-000000000000}");
 
     public static create(itemVersionUri: ItemVersionUri, fieldId: string): FieldUri {
-        const key = itemVersionUri.toString() + '/' + fieldId;
+        const key = itemVersionUri.toString() + "/" + fieldId;
 
         let fieldUri = FieldUri.cache[key];
         if (!fieldUri) {
@@ -31,9 +29,9 @@ export class FieldUri {
         }
 
         if (isString(s)) {
-            const n = s.lastIndexOf('/');
+            const n = s.lastIndexOf("/");
             if (n < 0) {
-                throw 'Invalid FieldUri: ' + s;
+                throw new Error("Invalid FieldUri: " + s);
             }
 
             const itemVersionUri = s.substr(0, n);
@@ -46,10 +44,12 @@ export class FieldUri {
             return FieldUri.create(ItemVersionUri.create(ItemUri.create(DatabaseUri.create(WebsiteUri.create(s.host), s.databaseName), s.id), s.language, s.version), s.fieldId);
         }
 
-        throw 'Invalid FieldUri: ' + s;
+        throw new Error("Invalid FieldUri: " + s);
     }
 
-    protected constructor(public readonly itemVersionUri: ItemVersionUri, public readonly fieldId: string) {
+    private static cache: { [key: string]: FieldUri } = {};
+
+        protected constructor(public readonly itemVersionUri: ItemVersionUri, public readonly fieldId: string) {
     }
 
     public get databaseUri(): DatabaseUri {
@@ -65,7 +65,7 @@ export class FieldUri {
     }
 
     public toString() {
-        return this.itemVersionUri.toString() + '/' + this.fieldId;
+        return this.itemVersionUri.toString() + "/" + this.fieldId;
     }
 }
 

@@ -14,15 +14,15 @@ function debounce(func, delay = 400) {
 }
 exports.debounce = debounce;
 function isNumber(n) {
-    return typeof n === 'number';
+    return typeof n === "number";
 }
 exports.isNumber = isNumber;
 function isString(s) {
-    return typeof s === 'string';
+    return typeof s === "string";
 }
 exports.isString = isString;
 function deepEqual(x, y) {
-    if ((typeof x === 'object' && x != null) && (typeof y === 'object' && y != null)) {
+    if ((typeof x === "object" && x != null) && (typeof y === "object" && y != null)) {
         if (Object.keys(x).length !== Object.keys(y).length) {
             return false;
         }
