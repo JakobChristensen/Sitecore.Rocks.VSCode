@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HttpClient_1 = require("typed-rest-client/HttpClient");
+const vscode = require("vscode");
 const SitecoreItem_1 = require("../sitecore/SitecoreItem");
 class SitecoreConnection {
     constructor(host, userName, password) {
@@ -53,8 +54,8 @@ class SitecoreConnection {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(data.databases);
-            });
-        }));
+            }).catch(reason => this.handleError(reason, error));
+        }).catch(reason => this.handleError(reason, error)));
     }
     getItem(itemUri) {
         return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true")).then(response => {
@@ -112,6 +113,14 @@ class SitecoreConnection {
     }
     getUrl(url) {
         return this.host + url + (url.indexOf("?") < 0 ? "?" : "&") + "username=" + encodeURIComponent(this.userName) + "&password=" + encodeURIComponent(this.password);
+    }
+    handleError(reason, error) {
+        vscode.window.showErrorMessage("Failed to connect to Sitecore website - is the Sitecore.ContentDelivery.zip package installed?", "Download package").then((button) => {
+            if (button === "Download package") {
+                vscode.commands.executeCommand("vscode.open", vscode.Uri.parse("https://ci.appveyor.com/project/JakobChristensen/sitecore-contentdelivery/build/artifacts"));
+            }
+        });
+        error();
     }
 }
 SitecoreConnection.empty = new SitecoreConnection("", "", "");

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const TreeViewItem_1 = require("./TreeViewItem");
 const vscode = require("vscode");
-const DatabaseTreeViewItem_1 = require("./DatabaseTreeViewItem");
-const WebsiteUri_1 = require("../data/WebsiteUri");
 const DatabaseUri_1 = require("../data/DatabaseUri");
+const WebsiteUri_1 = require("../data/WebsiteUri");
+const DatabaseTreeViewItem_1 = require("./DatabaseTreeViewItem");
+const TreeViewItem_1 = require("./TreeViewItem");
 class ConnectionTreeViewItem extends TreeViewItem_1.TreeViewItem {
     constructor(connection) {
         super(null);
@@ -12,10 +12,10 @@ class ConnectionTreeViewItem extends TreeViewItem_1.TreeViewItem {
     }
     getTreeItem() {
         return {
-            treeViewItem: this,
-            label: this.connection.host,
             collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
-            contextValue: 'connection'
+            contextValue: "connection",
+            label: this.connection.host,
+            treeViewItem: this,
         };
     }
     getChildren() {
@@ -23,7 +23,7 @@ class ConnectionTreeViewItem extends TreeViewItem_1.TreeViewItem {
         return new Promise((completed, error) => {
             this.connection.getDatabases(websiteUri).then(databases => {
                 completed(databases.map(database => new DatabaseTreeViewItem_1.DatabaseTreeViewItem(this, DatabaseUri_1.DatabaseUri.create(websiteUri, database.name))));
-            });
+            }, (reason) => error(reason));
         });
     }
 }

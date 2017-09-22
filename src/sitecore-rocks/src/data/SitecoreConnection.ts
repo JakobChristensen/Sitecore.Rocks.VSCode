@@ -1,4 +1,5 @@
 import { HttpClient } from "typed-rest-client/HttpClient";
+import * as vscode from "vscode";
 import { SitecoreItem } from "../sitecore/SitecoreItem";
 import { DatabaseUri } from "./DatabaseUri";
 import { ItemUri } from "./ItemUri";
@@ -67,8 +68,8 @@ export class SitecoreConnection {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(data.databases);
-            });
-        }));
+            }).catch(reason => this.handleError(reason, error));
+        }).catch(reason => this.handleError(reason, error)));
     }
 
     public getItem(itemUri: ItemUri): Thenable<SitecoreItem> {
@@ -140,4 +141,13 @@ export class SitecoreConnection {
         return this.host + url + (url.indexOf("?") < 0 ? "?" : "&") + "username=" + encodeURIComponent(this.userName) + "&password=" + encodeURIComponent(this.password);
     }
 
+    private handleError(reason: any, error: () => void) {
+        vscode.window.showErrorMessage("Failed to connect to Sitecore website - is the Sitecore.ContentDelivery.zip package installed?", "Download package").then((button: string) => {
+            if (button === "Download package") {
+                vscode.commands.executeCommand("vscode.open", vscode.Uri.parse("https://ci.appveyor.com/project/JakobChristensen/sitecore-contentdelivery/build/artifacts"));
+            }
+        });
+
+        error();
+    }
 }

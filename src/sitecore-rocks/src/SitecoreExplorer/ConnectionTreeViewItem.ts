@@ -1,11 +1,11 @@
-import { TreeViewItem } from './TreeViewItem';
-import { TreeItem } from 'vscode';
-import { SitecoreConnection } from '../data/SitecoreConnection';
-import { SitecoreTreeItem } from './SitecoreTreeItem';
-import * as vscode from 'vscode';
-import { DatabaseTreeViewItem } from './DatabaseTreeViewItem';
-import { WebsiteUri } from '../data/WebsiteUri';
-import { DatabaseUri } from '../data/DatabaseUri';
+import { TreeItem } from "vscode";
+import * as vscode from "vscode";
+import { DatabaseUri } from "../data/DatabaseUri";
+import { SitecoreConnection } from "../data/SitecoreConnection";
+import { WebsiteUri } from "../data/WebsiteUri";
+import { DatabaseTreeViewItem } from "./DatabaseTreeViewItem";
+import { SitecoreTreeItem } from "./SitecoreTreeItem";
+import { TreeViewItem } from "./TreeViewItem";
 
 export class ConnectionTreeViewItem extends TreeViewItem {
 
@@ -15,11 +15,11 @@ export class ConnectionTreeViewItem extends TreeViewItem {
 
     public getTreeItem(): SitecoreTreeItem {
         return {
-            treeViewItem: this,
-            label: this.connection.host,
             collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
-            contextValue: 'connection'
-        }
+            contextValue: "connection",
+            label: this.connection.host,
+            treeViewItem: this,
+        };
     }
 
     public getChildren(): TreeViewItem[] | Thenable<TreeViewItem[]> {
@@ -28,11 +28,11 @@ export class ConnectionTreeViewItem extends TreeViewItem {
         return new Promise<TreeViewItem[]>((completed, error) => {
             this.connection.getDatabases(websiteUri).then(databases => {
                 completed(databases.map(database => new DatabaseTreeViewItem(this, DatabaseUri.create(websiteUri, database.name))));
-            })
+            }, (reason: any) => error(reason));
         });
     }
 }
 
 export function isConnectionTreeViewItem(item: TreeViewItem): item is ConnectionTreeViewItem {
-    return (<any>item).connection != null;
+    return (item as any).connection != null;
 }

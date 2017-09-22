@@ -1,9 +1,9 @@
 {
-    "name": "sitecore-rocks",
-    "displayName": "Sitecore.Rocks",
+    "name": "sitecore-rocks-vscode",
+    "displayName": "Sitecore Rocks VS Code",
     "description": "Sitecore Rocks VS Code",
     "version": "0.0.1",
-    "publisher": "Sitecore",
+    "publisher": "refactor11",
     "engines": {
         "vscode": "^1.15.0"
     },
@@ -55,42 +55,46 @@
         },
         "menus": {
             "view/title": [
-				{
-					"command": "extension.sitecore.addConnection",
-					"when": "view == sitecoreExplorer"
-				}
-			],
-			"view/item/context": [
-				{
+                {
+                    "command": "extension.sitecore.addConnection",
+                    "when": "view == sitecoreExplorer"
+                }
+            ],
+            "view/item/context": [
+                {
                     "command": "extension.sitecore.addItem",
-					"when": "view == sitecoreExplorer && viewItem == item"
+                    "when": "view == sitecoreExplorer && viewItem == item"
                 },
-				{
+                {
                     "command": "extension.sitecore.deleteItem",
-					"when": "view == sitecoreExplorer && viewItem == item"
-                },
-				{
-					"command": "extension.sitecore.editItem",
-					"when": "view == sitecoreExplorer && viewItem == item"
+                    "when": "view == sitecoreExplorer && viewItem == item"
                 },
                 {
-					"command": "extension.sitecore.refresh",
-					"when": "view == sitecoreExplorer && viewItem == item"
-				},
+                    "command": "extension.sitecore.editItem",
+                    "when": "view == sitecoreExplorer && viewItem == item"
+                },
                 {
-					"command": "extension.sitecore.refresh",
-					"when": "view == sitecoreExplorer && viewItem == database"
-				},
+                    "command": "extension.sitecore.refresh",
+                    "when": "view == sitecoreExplorer && viewItem == item"
+                },
                 {
-					"command": "extension.sitecore.refresh",
-					"when": "view == sitecoreExplorer && viewItem == connection"
-				},
+                    "command": "extension.sitecore.refresh",
+                    "when": "view == sitecoreExplorer && viewItem == database"
+                },
                 {
-					"command": "extension.sitecore.removeConnection",
-					"when": "view == sitecoreExplorer && viewItem == connection"
-				}
+                    "command": "extension.sitecore.refresh",
+                    "when": "view == sitecoreExplorer && viewItem == connection"
+                },
+                {
+                    "command": "extension.sitecore.removeConnection",
+                    "when": "view == sitecoreExplorer && viewItem == connection"
+                }
             ]
-		}
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/JakobChristensen/Sitecore.Rocks.VSCode.git"
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
