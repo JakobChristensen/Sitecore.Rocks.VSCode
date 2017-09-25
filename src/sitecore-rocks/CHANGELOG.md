@@ -1,7 +1,9 @@
 # Change Log
-All notable changes to the "sitecore-rocks" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
-- Initial release
+
+## [0.0.1] - 2017-09-22
+### Added
+- Sitecore Explorer
+- Field Editor
+- Basic CRUD

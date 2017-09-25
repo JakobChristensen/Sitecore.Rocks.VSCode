@@ -1,9 +1,7 @@
-import { isString } from './helpers';
-import { SitecoreConnection } from './SitecoreConnection';
+import { isString } from "./helpers";
+import { SitecoreConnection } from "./SitecoreConnection";
 
 export class WebsiteUri {
-    private static cache: { [key: string]: WebsiteUri } = {};
-
     public static readonly empty = new WebsiteUri(SitecoreConnection.empty);
 
     public static create(host: string): WebsiteUri {
@@ -12,7 +10,7 @@ export class WebsiteUri {
         if (!websiteUri) {
             const connection = SitecoreConnection.get(host);
             if (!connection) {
-                throw 'Unknown connection: ' + host;
+                throw new Error("Unknown connection: " + host);
             }
 
             websiteUri = new WebsiteUri(connection);
@@ -50,8 +48,10 @@ export class WebsiteUri {
             return WebsiteUri.create(s.host);
         }
 
-        throw 'Invalid WebsiteUri: ' + s;
+        throw new Error("Invalid WebsiteUri: " + s);
     }
+
+    private static cache: { [key: string]: WebsiteUri } = {};
 
     protected constructor(public readonly connection: SitecoreConnection) {
     }

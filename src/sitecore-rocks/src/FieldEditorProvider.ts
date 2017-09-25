@@ -1,7 +1,6 @@
-import * as vscode from 'vscode';
-import { ItemUri } from './data/ItemUri';
-import { ProviderResult } from 'vscode';
-import { SitecoreItem, SitecoreField } from './sitecore/SitecoreItem';
+import * as vscode from "vscode";
+import { ItemUri } from "./data/ItemUri";
+import { SitecoreItem } from "./sitecore/SitecoreItem";
 
 export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
@@ -9,7 +8,7 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
     constructor(public absolutePath: string) {
     }
 
-    public provideTextDocumentContent(uri: vscode.Uri): ProviderResult<string> {
+    public provideTextDocumentContent(uri: vscode.Uri): vscode.ProviderResult<string> {
         const s = uri.toString().substr(16);
         const itemUri = ItemUri.parse(s);
 
@@ -25,7 +24,7 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
     }
 
     private render(item: SitecoreItem): string {
-        let output = `
+        const output = `
 <html>
 <head>
     <base href="">
@@ -161,4 +160,3 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
         `;
     }
 }
-

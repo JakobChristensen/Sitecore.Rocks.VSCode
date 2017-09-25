@@ -1,31 +1,36 @@
-import { TreeViewItem } from './TreeViewItem';
-import { TreeItem } from 'vscode';
-import { SitecoreConnection } from '../data/SitecoreConnection';
-import { SitecoreTreeItem } from './SitecoreTreeItem';
-import * as vscode from 'vscode';
-import { ItemTreeViewItem } from './ItemTreeViewItem';
-import { DatabaseUri } from '../data/DatabaseUri';
-import { ItemUri } from '../data/ItemUri';
+import * as vscode from "vscode";
+import { DatabaseUri } from "../data/DatabaseUri";
+import { ItemUri } from "../data/ItemUri";
+import { SitecoreConnection } from "../data/SitecoreConnection";
+import { SitecoreExplorerProvider } from "../SitecoreExplorer";
+import { ItemTreeViewItem } from "./ItemTreeViewItem";
+import { SitecoreTreeItem } from "./SitecoreTreeItem";
+import { TreeViewItem } from "./TreeViewItem";
 
 export class DatabaseTreeViewItem extends TreeViewItem {
-    constructor(parent: TreeViewItem, public databaseUri: DatabaseUri) {
-        super(parent);
+    constructor(sitecoreExplorer: SitecoreExplorerProvider, parent: TreeViewItem, public databaseUri: DatabaseUri) {
+        super(sitecoreExplorer, parent);
     }
 
     public getTreeItem(): SitecoreTreeItem {
-        return {
-            treeViewItem: this,
-            label: this.databaseUri.databaseName,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
-            contextValue: 'database'
-        }
+        this.treeItem = new SitecoreTreeItem(this, this.databaseUri.databaseName, vscode.TreeItemCollapsibleState.Collapsed, "database");
+        return this.treeItem;
     }
 
     public getChildren(): TreeViewItem[] | Thenable<TreeViewItem[]> {
         return new Promise<TreeViewItem[]>((completed, error) => {
             this.databaseUri.websiteUri.connection.getRoots(this.databaseUri).then(items => {
-                completed(items.map(item => new ItemTreeViewItem(this, ItemUri.create(this.databaseUri, item.id), item)));
-            })
+                this.children = items.map(item => new ItemTreeViewItem(this.sitecoreExplorer, this, ItemUri.create(this.databaseUri, item.id), item));
+                completed(this.children);
+            });
         });
     }
+
+    public getUri(): string {
+        return this.databaseUri.toString();
+    }
+}
+
+export function isDatabaseTreeViewItem(item: TreeViewItem): item is DatabaseTreeViewItem {
+    return !!(item as any).databaseUri;
 }

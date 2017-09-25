@@ -30,7 +30,8 @@
             },
             {
                 "command": "extension.sitecore.deleteItem",
-                "title": "Sitecore: Delete"
+                "title": "Sitecore: Delete",
+                "when": "view == sitecoreExplorer && viewItem == item"
             },
             {
                 "command": "extension.sitecore.editItem",

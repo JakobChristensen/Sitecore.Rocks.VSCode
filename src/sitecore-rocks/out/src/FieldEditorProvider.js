@@ -20,7 +20,7 @@ class FieldEditorProvider {
         return this._onDidChange.event;
     }
     render(item) {
-        let output = `
+        const output = `
 <html>
 <head>
     <base href="">

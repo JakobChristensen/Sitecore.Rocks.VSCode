@@ -11,7 +11,7 @@ class WebsiteUri {
         if (!websiteUri) {
             const connection = SitecoreConnection_1.SitecoreConnection.get(host);
             if (!connection) {
-                throw 'Unknown connection: ' + host;
+                throw new Error("Unknown connection: " + host);
             }
             websiteUri = new WebsiteUri(connection);
             WebsiteUri.cache[connection.host] = websiteUri;
@@ -39,7 +39,7 @@ class WebsiteUri {
         if (s.host) {
             return WebsiteUri.create(s.host);
         }
-        throw 'Invalid WebsiteUri: ' + s;
+        throw new Error("Invalid WebsiteUri: " + s);
     }
     equals(websiteUri) {
         return websiteUri.connection === this.connection;
@@ -48,8 +48,8 @@ class WebsiteUri {
         return this.connection.host;
     }
 }
-WebsiteUri.cache = {};
 WebsiteUri.empty = new WebsiteUri(SitecoreConnection_1.SitecoreConnection.empty);
+WebsiteUri.cache = {};
 exports.WebsiteUri = WebsiteUri;
 function isWebsiteUri(a) {
     return a instanceof WebsiteUri;

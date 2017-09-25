@@ -1,24 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class SitecoreField {
-    constructor(data, host, updateOriginalValue = true) {
-        this.id = "";
-        this.uri = "";
-        this.name = "";
-        this.displayName = "";
-        this.value = "";
-        this.originalValue = "";
-        this.host = "";
-        Object.assign(this, data);
-        if (updateOriginalValue) {
-            this.originalValue = this.value;
-        }
-        if (host) {
-            this.host = host;
-        }
-    }
-}
-exports.SitecoreField = SitecoreField;
+const DatabaseUri_1 = require("../data/DatabaseUri");
+const ItemUri_1 = require("../data/ItemUri");
+const WebsiteUri_1 = require("../data/WebsiteUri");
+const SitecoreField_1 = require("./SitecoreField");
 class SitecoreItem {
     constructor(data, host, updateOriginalValue = true) {
         this.id = "";
@@ -29,18 +14,16 @@ class SitecoreItem {
         this.icon16x16 = "";
         this.icon32x32 = "";
         this.path = "";
+        this.longPath = "";
         this.templateId = "";
         this.templateName = "";
         this.childCount = 0;
-        this.host = "";
         Object.assign(this, data);
-        if (host) {
-            this.host = host;
-        }
+        this.itemUri = ItemUri_1.ItemUri.create(DatabaseUri_1.DatabaseUri.create(WebsiteUri_1.WebsiteUri.create(host), this.database), this.id);
         if (data.fields) {
             this.fields = new Array();
-            for (let field of data.fields) {
-                this.fields.push(new SitecoreField(field, host, updateOriginalValue));
+            for (const field of data.fields) {
+                this.fields.push(new SitecoreField_1.SitecoreField(field, host, updateOriginalValue));
             }
         }
     }
@@ -48,7 +31,7 @@ class SitecoreItem {
         if (!this.fields) {
             return;
         }
-        for (let field of this.fields) {
+        for (const field of this.fields) {
             field.originalValue = field.value;
         }
     }

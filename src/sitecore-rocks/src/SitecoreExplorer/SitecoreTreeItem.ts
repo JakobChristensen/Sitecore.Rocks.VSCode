@@ -1,6 +1,9 @@
-import { TreeItem } from 'vscode';
+import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import { TreeViewItem } from "./TreeViewItem";
 
 export class SitecoreTreeItem extends TreeItem {
-    public treeViewItem?: TreeViewItem;
+    constructor(public treeViewItem: TreeViewItem, label: string, collapsibleState: TreeItemCollapsibleState, contextValue: string) {
+        super(label, collapsibleState);
+        this.contextValue = contextValue;
+    }
 }
