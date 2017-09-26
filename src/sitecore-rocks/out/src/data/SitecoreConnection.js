@@ -58,7 +58,7 @@ class SitecoreConnection {
         }).catch(reason => this.handleError(reason, error)));
     }
     getItem(itemUri) {
-        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true")).then(response => {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true&emptyfields=true")).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem_1.SitecoreItem(data, this.host));
@@ -85,10 +85,23 @@ class SitecoreConnection {
             });
         }));
     }
+    getInsertOptions(itemUri) {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/insertoptions/" + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const items = data.items;
+                const insertOptions = items.map(d => new SitecoreItem_1.SitecoreItem(d, this.host));
+                completed(insertOptions);
+            });
+        }));
+    }
     saveItems(items) {
         let data = "";
         let databaseName = "";
         for (const item of items) {
+            if (!item.fields) {
+                continue;
+            }
             for (const field of item.fields) {
                 if (field.value !== field.originalValue) {
                     data += (data.length > 0 ? "&" : "") + field.uri + "=" + encodeURIComponent(field.value);
@@ -97,7 +110,7 @@ class SitecoreConnection {
             }
         }
         if (!databaseName) {
-            return;
+            return Promise.resolve();
         }
         const headers = {
             "Content-Type": "application/x-www-form-urlencoded",

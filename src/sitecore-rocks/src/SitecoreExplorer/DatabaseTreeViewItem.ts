@@ -31,6 +31,6 @@ export class DatabaseTreeViewItem extends TreeViewItem {
     }
 }
 
-export function isDatabaseTreeViewItem(item: TreeViewItem): item is DatabaseTreeViewItem {
-    return !!(item as any).databaseUri;
+export function isDatabaseTreeViewItem(item: TreeViewItem | undefined): item is DatabaseTreeViewItem {
+    return !!item && !!(item as any).databaseUri;
 }

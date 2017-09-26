@@ -26,7 +26,7 @@
             },
             {
                 "command": "extension.sitecore.addItem",
-                "title": "Sitecore: Insert"
+                "title": "Sitecore: Add from Template"
             },
             {
                 "command": "extension.sitecore.deleteItem",
@@ -38,8 +38,16 @@
                 "title": "Sitecore: Edit"
             },
             {
-                "command": "extension.sitecoreSaveItem",
+                "command": "extension.sitecore.insertItem",
+                "title": "Sitecore: Insert"
+            },
+            {
+                "command": "extension.sitecore.SaveItem",
                 "title": "Sitecore: Save"
+            },
+            {
+                "command": "extension.sitecore.selectItem",
+                "title": "Sitecore: Select Item [Internal]"
             },
             {
                 "command": "extension.sitecore.refresh",
@@ -50,7 +58,7 @@
             "explorer": [
                 {
                     "id": "sitecoreExplorer",
-                    "name": "Sitecore"
+                    "name": "Sitecore Explorer"
                 }
             ]
         },
@@ -72,6 +80,10 @@
                 },
                 {
                     "command": "extension.sitecore.editItem",
+                    "when": "view == sitecoreExplorer && viewItem == item"
+                },
+                {
+                    "command": "extension.sitecore.insertItem",
                     "when": "view == sitecoreExplorer && viewItem == item"
                 },
                 {

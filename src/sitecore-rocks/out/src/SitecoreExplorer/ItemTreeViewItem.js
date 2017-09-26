@@ -19,7 +19,6 @@ class ItemTreeViewItem extends TreeViewItem_1.TreeViewItem {
             this.itemUri.websiteUri.connection.getChildren(this.itemUri).then(items => {
                 this.children = items.map(item => new ItemTreeViewItem(this.sitecoreExplorer, this, ItemUri_1.ItemUri.create(this.itemUri.databaseUri, item.id), item));
                 completed(this.children);
-                console.log("getchildren");
             });
         });
     }
@@ -29,7 +28,7 @@ class ItemTreeViewItem extends TreeViewItem_1.TreeViewItem {
 }
 exports.ItemTreeViewItem = ItemTreeViewItem;
 function isItemTreeViewItem(item) {
-    return !!item.itemUri;
+    return !!item && !!item.itemUri;
 }
 exports.isItemTreeViewItem = isItemTreeViewItem;
 //# sourceMappingURL=ItemTreeViewItem.js.map

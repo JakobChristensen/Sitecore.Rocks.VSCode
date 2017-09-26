@@ -9,7 +9,7 @@ export abstract class TreeViewItem {
 
     public children: TreeViewItem[];
 
-    constructor(public sitecoreExplorer: SitecoreExplorerProvider, public parent: TreeViewItem) {
+    constructor(public sitecoreExplorer: SitecoreExplorerProvider, public parent?: TreeViewItem) {
     }
 
     public abstract getTreeItem(): TreeItem;

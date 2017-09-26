@@ -8,7 +8,7 @@ const SitecoreTreeItem_1 = require("./SitecoreTreeItem");
 const TreeViewItem_1 = require("./TreeViewItem");
 class ConnectionTreeViewItem extends TreeViewItem_1.TreeViewItem {
     constructor(sitecoreExplorer, connection) {
-        super(sitecoreExplorer, null);
+        super(sitecoreExplorer);
         this.connection = connection;
     }
     getTreeItem() {
@@ -30,7 +30,7 @@ class ConnectionTreeViewItem extends TreeViewItem_1.TreeViewItem {
 }
 exports.ConnectionTreeViewItem = ConnectionTreeViewItem;
 function isConnectionTreeViewItem(item) {
-    return !!item.connection;
+    return !!item && !!item.connection;
 }
 exports.isConnectionTreeViewItem = isConnectionTreeViewItem;
 //# sourceMappingURL=ConnectionTreeViewItem.js.map

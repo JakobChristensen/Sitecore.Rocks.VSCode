@@ -3,7 +3,7 @@ import { ItemUri } from "./data/ItemUri";
 import { SitecoreItem } from "./sitecore/SitecoreItem";
 
 export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
-    private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
+    private onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
 
     constructor(public absolutePath: string) {
     }
@@ -20,7 +20,7 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
     }
 
     public get onDidChange(): vscode.Event<vscode.Uri> {
-        return this._onDidChange.event;
+        return this.onDidChangeEmitter.event;
     }
 
     private render(item: SitecoreItem): string {
@@ -37,8 +37,8 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
     ${this.renderFields(item)}
     </div>
 
-    <label>Item information:</label>
-    <div class="panel">
+    <label><span style="display: inline-block"><a href="#" class="button" data-bind="css: {rotate: showInformation()}, click: toggleInformation">&rsaquo;</a></span> Item information:</label>
+    <div class="panel" data-bind="visible: showInformation()">
         <table>
             <tr><td>Name:</td><td data-bind="text: name"></td></tr>
             <tr><td>Display Name:</td><td data-bind="text: displayName"></td></tr>
@@ -70,6 +70,8 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
                 }
 
                 data.isModified = ko.computed(getIsModified, data);
+                data.showInformation = ko.observable(false);
+                data.toggleInformation = toggleInformation;
 
                 return data;
             }
@@ -84,7 +86,7 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
                     newItem.fields.push(newField);
                 }
 
-                let args = { "data": newItem };
+                let args = { "data": newItem, "host": "${item.itemUri.websiteUri.connection.host}" };
                 let saveItemCommand = "command:extension.sitecore.saveItem?" + encodeURIComponent(JSON.stringify(args));
                 window.parent.postMessage({ command: "did-click-link", data: saveItemCommand }, "file://");
 
@@ -101,6 +103,10 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
                 }
 
                 return false;
+            }
+
+            function toggleInformation() {
+                item.showInformation(!item.showInformation());
             }
         }());
     </script>
@@ -135,7 +141,7 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
             input[type=text] {
                 width: 100%;
                 padding: 6px 12px;
-                box-sizing : border-box;
+                box-sizing: border-box;
             }
             .field {
                 margin-bottom: 8px;
@@ -155,6 +161,19 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
                 border: 1px solid #383838;
                 color: #cccccc;
                 padding: 6px 12px;
+            }
+            .vscode-dark a.button {
+                color: #cccccc;
+            }
+
+            a.button {
+                display:block;
+                font-size: 24px;
+                text-decoration: none;
+                outline: none;
+            }
+            a.rotate {
+                transform: translateY(4px) rotate(90deg);
             }
         </style>
         `;

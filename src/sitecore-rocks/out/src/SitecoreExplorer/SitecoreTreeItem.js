@@ -6,6 +6,11 @@ class SitecoreTreeItem extends vscode_1.TreeItem {
         super(label, collapsibleState);
         this.treeViewItem = treeViewItem;
         this.contextValue = contextValue;
+        this.command = {
+            arguments: [this.treeViewItem],
+            command: "extension.sitecore.selectItem",
+            title: "Select Item",
+        };
     }
 }
 exports.SitecoreTreeItem = SitecoreTreeItem;

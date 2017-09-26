@@ -4,7 +4,7 @@ class QuickPickSitecoreItem {
     constructor(item) {
         this.item = item;
         this.label = item.displayName;
-        this.description = 'Template: ' + item.templateName;
+        this.description = "Template: " + item.templateName;
         this.detail = item.path;
     }
 }

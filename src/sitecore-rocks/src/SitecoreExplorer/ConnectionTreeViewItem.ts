@@ -10,7 +10,7 @@ import { TreeViewItem } from "./TreeViewItem";
 export class ConnectionTreeViewItem extends TreeViewItem {
 
     constructor(sitecoreExplorer: SitecoreExplorerProvider, public connection: SitecoreConnection) {
-        super(sitecoreExplorer, null);
+        super(sitecoreExplorer);
     }
 
     public getTreeItem(): SitecoreTreeItem {
@@ -34,6 +34,6 @@ export class ConnectionTreeViewItem extends TreeViewItem {
     }
 }
 
-export function isConnectionTreeViewItem(item: TreeViewItem): item is ConnectionTreeViewItem {
-    return !!(item as any).connection;
+export function isConnectionTreeViewItem(item: TreeViewItem | undefined): item is ConnectionTreeViewItem {
+    return !!item && !!(item as any).connection;
 }

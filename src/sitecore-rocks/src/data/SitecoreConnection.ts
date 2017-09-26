@@ -74,7 +74,7 @@ export class SitecoreConnection {
 
     public getItem(itemUri: ItemUri): Thenable<SitecoreItem> {
         return new Promise((completed, error) =>
-            this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true")).then(response => {
+            this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true&emptyfields=true")).then(response => {
                 response.readBody().then(body => {
                     const data = JSON.parse(body);
                     completed(new SitecoreItem(data, this.host));
@@ -106,10 +106,26 @@ export class SitecoreConnection {
         }));
     }
 
+    public getInsertOptions(itemUri: ItemUri): Thenable<SitecoreItem[]> {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/insertoptions/" + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const items = data.items as object[];
+                const insertOptions = items.map(d => new SitecoreItem(d, this.host));
+
+                completed(insertOptions);
+            });
+        }));
+    }
+
     public saveItems(items: SitecoreItem[]): Thenable<void> {
         let data = "";
         let databaseName = "";
         for (const item of items) {
+            if (!item.fields) {
+                continue;
+            }
+
             for (const field of item.fields) {
                 if (field.value !== field.originalValue) {
                     data += (data.length > 0 ? "&" : "") + field.uri + "=" + encodeURIComponent(field.value);
@@ -119,7 +135,7 @@ export class SitecoreConnection {
         }
 
         if (!databaseName) {
-            return;
+            return Promise.resolve();
         }
 
         const headers = {

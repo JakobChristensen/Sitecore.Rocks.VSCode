@@ -28,7 +28,7 @@ class DatabaseTreeViewItem extends TreeViewItem_1.TreeViewItem {
 }
 exports.DatabaseTreeViewItem = DatabaseTreeViewItem;
 function isDatabaseTreeViewItem(item) {
-    return !!item.databaseUri;
+    return !!item && !!item.databaseUri;
 }
 exports.isDatabaseTreeViewItem = isDatabaseTreeViewItem;
 //# sourceMappingURL=DatabaseTreeViewItem.js.map
