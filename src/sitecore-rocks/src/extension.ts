@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { FieldEditorProvider } from "./FieldEditorProvider";
+import { LayoutDesignerProvider } from "./LayoutDesignerProvider";
 import { SitecoreItem } from "./sitecore/SitecoreItem";
 import { SitecoreExplorerProvider } from "./SitecoreExplorer";
 import { ConnectionTreeViewItem } from "./SitecoreExplorer/ConnectionTreeViewItem";
@@ -12,13 +13,18 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider("sitecoreExplorer", sitecoreExplorer);
 
     // sitecore field editor
-    const provider = new FieldEditorProvider(context.asAbsolutePath("src/"));
-    vscode.workspace.registerTextDocumentContentProvider("sitecore-item", provider);
+    const fieldEditorProvider = new FieldEditorProvider(context.asAbsolutePath("src/"));
+    vscode.workspace.registerTextDocumentContentProvider("sitecore-item", fieldEditorProvider);
+
+    // sitecore layout designer
+    const layoutDesignerProvider = new LayoutDesignerProvider(context.asAbsolutePath("src/"));
+    vscode.workspace.registerTextDocumentContentProvider("sitecore-layout", layoutDesignerProvider);
 
     // commands
     vscode.commands.registerCommand("extension.sitecore.addConnection", () => sitecoreExplorer.addConnection());
     vscode.commands.registerCommand("extension.sitecore.addItem", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.addItem(item));
     vscode.commands.registerCommand("extension.sitecore.deleteItem", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.deleteItem(item));
+    vscode.commands.registerCommand("extension.sitecore.designLayout", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.designLayout(item));
     vscode.commands.registerCommand("extension.sitecore.editItem", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.editItem(item));
     vscode.commands.registerCommand("extension.sitecore.insertItem", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.insertItem(item));
     vscode.commands.registerCommand("extension.sitecore.navigateTemplate", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.navigateTemplate(item));

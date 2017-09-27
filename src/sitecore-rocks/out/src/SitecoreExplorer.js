@@ -73,34 +73,6 @@ class SitecoreExplorerProvider {
             this.onDidChangeTreeDataEmitter.fire();
         });
     }
-    editItem(item) {
-        const itemUri = this.getSelectedItemUri(item);
-        if (!itemUri) {
-            return;
-        }
-        let name = "Item";
-        if (item instanceof ItemTreeViewItem_1.ItemTreeViewItem) {
-            name = item.item.displayName;
-        }
-        else {
-            const t = this.find(itemUri.toString());
-            if (t) {
-                name = t.treeItem.label;
-            }
-        }
-        const previewUri = vscode.Uri.parse("sitecore-item://" + itemUri.toString());
-        return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
-    }
-    saveItem(item) {
-        item.itemUri.websiteUri.connection.saveItems([item]);
-    }
-    selectItem(treeViewItem) {
-        if (treeViewItem instanceof vscode.Uri) {
-            this.selectedTreeViewItem = undefined;
-            return;
-        }
-        this.selectedTreeViewItem = treeViewItem;
-    }
     addItem(parentItem) {
         const itemUri = this.getSelectedItemUri(parentItem);
         if (!itemUri) {
@@ -108,30 +80,6 @@ class SitecoreExplorerProvider {
         }
         itemUri.websiteUri.connection.getTemplates(itemUri.databaseUri).then(templates => {
             vscode.window.showQuickPick(templates.map(t => new QuickPickSitecoreItem_1.QuickPickSitecoreItem(t)), { placeHolder: "Select template of the new item" }).then(templateItem => {
-                if (!templateItem) {
-                    return;
-                }
-                vscode.window.showInputBox({ prompt: "Enter the name of the new item:", placeHolder: "NewItem", value: templateItem.item.displayName }).then(newName => {
-                    if (!newName) {
-                        return;
-                    }
-                    itemUri.websiteUri.connection.addItem(itemUri, templateItem.item.id, newName).then(() => {
-                        const treeViewItem = this.find(itemUri.toString());
-                        if (treeViewItem) {
-                            this.onDidChangeTreeDataEmitter.fire(treeViewItem);
-                        }
-                    });
-                });
-            });
-        });
-    }
-    insertItem(parentItem) {
-        const itemUri = this.getSelectedItemUri(parentItem);
-        if (!itemUri) {
-            return;
-        }
-        itemUri.websiteUri.connection.getInsertOptions(itemUri).then(insertOptions => {
-            vscode.window.showQuickPick(insertOptions.map(t => new QuickPickSitecoreItem_1.QuickPickSitecoreItem(t)), { placeHolder: "Select template of the new item" }).then(templateItem => {
                 if (!templateItem) {
                     return;
                 }
@@ -177,6 +125,66 @@ class SitecoreExplorerProvider {
             });
         });
     }
+    designLayout(item) {
+        const itemUri = this.getSelectedItemUri(item);
+        if (!itemUri) {
+            return;
+        }
+        let name = "Layout";
+        if (item instanceof ItemTreeViewItem_1.ItemTreeViewItem) {
+            name = item.item.displayName + " layout";
+        }
+        else {
+            const t = this.find(itemUri.toString());
+            if (t) {
+                name = t.treeItem.label + " layout";
+            }
+        }
+        const previewUri = vscode.Uri.parse("sitecore-layout://" + itemUri.toString());
+        return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
+    }
+    editItem(item) {
+        const itemUri = this.getSelectedItemUri(item);
+        if (!itemUri) {
+            return;
+        }
+        let name = "Item";
+        if (item instanceof ItemTreeViewItem_1.ItemTreeViewItem) {
+            name = item.item.displayName;
+        }
+        else {
+            const t = this.find(itemUri.toString());
+            if (t) {
+                name = t.treeItem.label;
+            }
+        }
+        const previewUri = vscode.Uri.parse("sitecore-item://" + itemUri.toString());
+        return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
+    }
+    insertItem(parentItem) {
+        const itemUri = this.getSelectedItemUri(parentItem);
+        if (!itemUri) {
+            return;
+        }
+        itemUri.websiteUri.connection.getInsertOptions(itemUri).then(insertOptions => {
+            vscode.window.showQuickPick(insertOptions.map(t => new QuickPickSitecoreItem_1.QuickPickSitecoreItem(t)), { placeHolder: "Select template of the new item" }).then(templateItem => {
+                if (!templateItem) {
+                    return;
+                }
+                vscode.window.showInputBox({ prompt: "Enter the name of the new item:", placeHolder: "NewItem", value: templateItem.item.displayName }).then(newName => {
+                    if (!newName) {
+                        return;
+                    }
+                    itemUri.websiteUri.connection.addItem(itemUri, templateItem.item.id, newName).then(() => {
+                        const treeViewItem = this.find(itemUri.toString());
+                        if (treeViewItem) {
+                            this.onDidChangeTreeDataEmitter.fire(treeViewItem);
+                        }
+                    });
+                });
+            });
+        });
+    }
     navigateTemplate(item) {
         const itemUri = this.getSelectedItemUri(item);
         if (!itemUri) {
@@ -212,6 +220,16 @@ class SitecoreExplorerProvider {
             return;
         }
         this.onDidChangeTreeDataEmitter.fire(selectedItem);
+    }
+    saveItem(item) {
+        item.itemUri.websiteUri.connection.saveItems([item]);
+    }
+    selectItem(treeViewItem) {
+        if (treeViewItem instanceof vscode.Uri) {
+            this.selectedTreeViewItem = undefined;
+            return;
+        }
+        this.selectedTreeViewItem = treeViewItem;
     }
     saveConnections() {
         const json = new Array();

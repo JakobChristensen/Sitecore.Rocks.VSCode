@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
 const FieldEditorProvider_1 = require("./FieldEditorProvider");
+const LayoutDesignerProvider_1 = require("./LayoutDesignerProvider");
 const SitecoreItem_1 = require("./sitecore/SitecoreItem");
 const SitecoreExplorer_1 = require("./SitecoreExplorer");
 function activate(context) {
@@ -9,12 +10,16 @@ function activate(context) {
     const sitecoreExplorer = new SitecoreExplorer_1.SitecoreExplorerProvider(context);
     vscode.window.registerTreeDataProvider("sitecoreExplorer", sitecoreExplorer);
     // sitecore field editor
-    const provider = new FieldEditorProvider_1.FieldEditorProvider(context.asAbsolutePath("src/"));
-    vscode.workspace.registerTextDocumentContentProvider("sitecore-item", provider);
+    const fieldEditorProvider = new FieldEditorProvider_1.FieldEditorProvider(context.asAbsolutePath("src/"));
+    vscode.workspace.registerTextDocumentContentProvider("sitecore-item", fieldEditorProvider);
+    // sitecore layout designer
+    const layoutDesignerProvider = new LayoutDesignerProvider_1.LayoutDesignerProvider(context.asAbsolutePath("src/"));
+    vscode.workspace.registerTextDocumentContentProvider("sitecore-layout", layoutDesignerProvider);
     // commands
     vscode.commands.registerCommand("extension.sitecore.addConnection", () => sitecoreExplorer.addConnection());
     vscode.commands.registerCommand("extension.sitecore.addItem", (item) => sitecoreExplorer.addItem(item));
     vscode.commands.registerCommand("extension.sitecore.deleteItem", (item) => sitecoreExplorer.deleteItem(item));
+    vscode.commands.registerCommand("extension.sitecore.designLayout", (item) => sitecoreExplorer.designLayout(item));
     vscode.commands.registerCommand("extension.sitecore.editItem", (item) => sitecoreExplorer.editItem(item));
     vscode.commands.registerCommand("extension.sitecore.insertItem", (item) => sitecoreExplorer.insertItem(item));
     vscode.commands.registerCommand("extension.sitecore.navigateTemplate", (item) => sitecoreExplorer.navigateTemplate(item));

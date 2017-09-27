@@ -37,6 +37,11 @@
                 "category": "Sitecore"
             },
             {
+                "command": "extension.sitecore.designLayout",
+                "title": "Design Layout",
+                "category": "Sitecore"
+            },
+            {
                 "command": "extension.sitecore.editItem",
                 "title": "Edit",
                 "category": "Sitecore"
@@ -90,6 +95,10 @@
                 },
                 {
                     "command": "extension.sitecore.deleteItem",
+                    "when": "view == sitecoreExplorer && viewItem == item"
+                },
+                {
+                    "command": "extension.sitecore.designLayout",
                     "when": "view == sitecoreExplorer && viewItem == item"
                 },
                 {
