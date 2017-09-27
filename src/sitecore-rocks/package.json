@@ -2,7 +2,7 @@
     "name": "sitecore-rocks-vscode",
     "displayName": "Sitecore Rocks VS Code",
     "description": "Sitecore Rocks VS Code",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "refactor11",
     "engines": {
         "vscode": "^1.15.0"
@@ -18,40 +18,48 @@
         "commands": [
             {
                 "command": "extension.sitecore.addConnection",
-                "title": "Sitecore: Add Connection"
+                "title": "Add Connection",
+                "category": "Sitecore"
             },
             {
                 "command": "extension.sitecore.removeConnection",
-                "title": "Sitecore: Remove Connection"
+                "title": "Remove Connection",
+                "category": "Sitecore"
             },
             {
                 "command": "extension.sitecore.addItem",
-                "title": "Sitecore: Add from Template"
+                "title": "Add from Template",
+                "category": "Sitecore"
             },
             {
                 "command": "extension.sitecore.deleteItem",
-                "title": "Sitecore: Delete",
-                "when": "view == sitecoreExplorer && viewItem == item"
+                "title": "Delete",
+                "category": "Sitecore"
             },
             {
                 "command": "extension.sitecore.editItem",
-                "title": "Sitecore: Edit"
+                "title": "Edit",
+                "category": "Sitecore"
             },
             {
                 "command": "extension.sitecore.insertItem",
-                "title": "Sitecore: Insert"
+                "title": "Insert",
+                "category": "Sitecore"
             },
             {
-                "command": "extension.sitecore.SaveItem",
-                "title": "Sitecore: Save"
+                "command": "extension.sitecore.saveItem",
+                "title": "Save",
+                "category": "Sitecore"
             },
             {
                 "command": "extension.sitecore.selectItem",
-                "title": "Sitecore: Select Item [Internal]"
+                "title": "[Internal] Select Item",
+                "category": "Sitecore"
             },
             {
                 "command": "extension.sitecore.refresh",
-                "title": "Sitecore: Refresh"
+                "title": "Refresh",
+                "category": "Sitecore"
             }
         ],
         "views": {
@@ -63,6 +71,12 @@
             ]
         },
         "menus": {
+            "editor/title": [
+				{
+					"when": "resourceScheme == sitecore-item",
+					"command": "extension.sitecore.deleteItem"
+				}
+            ],
             "view/title": [
                 {
                     "command": "extension.sitecore.addConnection",

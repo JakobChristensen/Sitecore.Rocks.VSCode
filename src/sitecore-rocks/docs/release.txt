@@ -1,0 +1,4 @@
+1. Create a new branch on GitHub with name 'release/0.0.1' version number
+2. Update version number in package.json
+2. Update CHANGELOG.md
+3. Execute 'vsce publish' to publish on marketplace

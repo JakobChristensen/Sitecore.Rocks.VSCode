@@ -34,8 +34,8 @@ export class SitecoreConnection {
     protected constructor(public host: string, public userName: string, public password: string) {
     }
 
-    public addItem(databaseUri: DatabaseUri, path: string, templateId: string, name: string): Thenable<SitecoreItem> {
-        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/put/item/" + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
+    public addItem(parentItemUri: ItemUri, templateId: string, name: string): Thenable<SitecoreItem> {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/put/item/" + parentItemUri.databaseUri.databaseName + "/" + encodeURIComponent(parentItemUri.id) + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem(data.item, this.host));

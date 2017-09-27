@@ -24,8 +24,8 @@ class SitecoreConnection {
     static clearCache() {
         SitecoreConnection.cache = {};
     }
-    addItem(databaseUri, path, templateId, name) {
-        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/put/item/" + databaseUri.databaseName + path + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
+    addItem(parentItemUri, templateId, name) {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/put/item/" + parentItemUri.databaseUri.databaseName + "/" + encodeURIComponent(parentItemUri.id) + "/" + name + "?template=" + encodeURIComponent(templateId))).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 completed(new SitecoreItem_1.SitecoreItem(data.item, this.host));

@@ -20,7 +20,7 @@ class FieldEditorProvider {
         return this.onDidChangeEmitter.event;
     }
     render(item) {
-        const output = `
+        return `
 <html>
 <head>
     <base href="">
@@ -31,25 +31,13 @@ class FieldEditorProvider {
     <h1>${item.displayName}<span data-bind="visible: isModified()">*</span></h1>
     <div>
     ${this.renderFields(item)}
-    </div>
-
-    <label><span style="display: inline-block"><a href="#" class="button" data-bind="css: {rotate: showInformation()}, click: toggleInformation">&rsaquo;</a></span> Item information:</label>
-    <div class="panel" data-bind="visible: showInformation()">
-        <table>
-            <tr><td>Name:</td><td data-bind="text: name"></td></tr>
-            <tr><td>Display Name:</td><td data-bind="text: displayName"></td></tr>
-            <tr><td>Template:</td><td data-bind="text: templateName"></td></tr>
-            <tr><td>Path:</td><td data-bind="text: path"></td></tr>
-            <tr><td>Database:</td><td data-bind="text: database"></td></tr>
-            <tr><td>ID:</td><td data-bind="text: id"></td></tr>
-        </table>
+    ${this.renderInformation()}
     </div>
 
     <script type="application/javascript">
         (function() {
-            var item = loadItem(${JSON.stringify(item)});
-
-            ko.applyBindings(item);
+            var model = loadModel();
+            ko.applyBindings(model);
 
             window.onkeyup = function(event) {
                 if (event.keyCode == 83 && event.ctrlKey) {
@@ -59,26 +47,29 @@ class FieldEditorProvider {
                 }
             }
 
-            function loadItem(data) {
-                for (let field of data.fields) {
+            function loadModel() {
+                var model = ${JSON.stringify(item)};
+
+                for (let field of model.fields) {
                     field.value = ko.observable(field.value);
                     field.originalValue = ko.observable(field.originalValue);
                 }
 
-                data.isModified = ko.computed(getIsModified, data);
-                data.showInformation = ko.observable(false);
-                data.toggleInformation = toggleInformation;
+                model.isModified = ko.computed(getIsModified, model);
+                model.showInformation = ko.observable(false);
+                model.toggleInformation = toggleInformation;
 
-                return data;
+                return model;
             }
 
             function saveItem() {
-                let newItem = Object.assign({}, item);
+                let newItem = Object.assign({}, model);
+
                 newItem.fields = [];
-                for (let index = 0; index < item.fields.length; index++) {
-                    let newField = Object.assign({}, item.fields[index])
-                    newField.value = item.fields[index].value();
-                    newField.originalValue = item.fields[index].originalValue();
+                for (let index = 0; index < model.fields.length; index++) {
+                    let newField = Object.assign({}, model.fields[index])
+                    newField.value = model.fields[index].value();
+                    newField.originalValue = model.fields[index].originalValue();
                     newItem.fields.push(newField);
                 }
 
@@ -86,7 +77,7 @@ class FieldEditorProvider {
                 let saveItemCommand = "command:extension.sitecore.saveItem?" + encodeURIComponent(JSON.stringify(args));
                 window.parent.postMessage({ command: "did-click-link", data: saveItemCommand }, "file://");
 
-                for (let field of item.fields) {
+                for (let field of model.fields) {
                     field.originalValue(field.value());
                 }
             }
@@ -102,13 +93,12 @@ class FieldEditorProvider {
             }
 
             function toggleInformation() {
-                item.showInformation(!item.showInformation());
+                model.showInformation(!model.showInformation());
             }
         }());
     </script>
 </body>
 </html>`;
-        return output;
     }
     renderFields(item) {
         return `
@@ -121,6 +111,21 @@ class FieldEditorProvider {
                     <input type="text" data-bind="textInput: value">
                 </div>
             </div>
+        </div>
+        `;
+    }
+    renderInformation() {
+        return `
+        <label><span style="display: inline-block"><a href="#" class="button" data-bind="css: {rotate: showInformation()}, click: toggleInformation">&rsaquo;</a></span> Item information:</label>
+        <div class="panel" data-bind="visible: showInformation()">
+            <table>
+                <tr><td>Name:</td><td data-bind="text: name"></td></tr>
+                <tr><td>Display Name:</td><td data-bind="text: displayName"></td></tr>
+                <tr><td>Template:</td><td data-bind="text: templateName"></td></tr>
+                <tr><td>Path:</td><td data-bind="text: path"></td></tr>
+                <tr><td>Database:</td><td data-bind="text: database"></td></tr>
+                <tr><td>ID:</td><td data-bind="text: id"></td></tr>
+            </table>
         </div>
         `;
     }
