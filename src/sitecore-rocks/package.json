@@ -2,7 +2,7 @@
     "name": "sitecore-rocks-vscode",
     "displayName": "Sitecore Rocks VS Code",
     "description": "Sitecore Rocks VS Code",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "refactor11",
     "engines": {
         "vscode": "^1.15.0"
