@@ -174,6 +174,7 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         }
 
         const previewUri = vscode.Uri.parse("sitecore-layout://" + itemUri.toString());
+
         return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
     }
 
