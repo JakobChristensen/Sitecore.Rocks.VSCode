@@ -38,7 +38,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                     <a href="#" data-bind="click: $root.addRendering"> Add </a>
                     <a href="#" data-bind="click: $root.removePlaceholder"> Delete </a>
                 </div>
-                <span class="placeholder">&nbsp;Placeholder</span>
+                <span class="placeholder">&nbsp;&nbsp;Placeholder</span>
                 <input type="text" class="placeholder" data-bind="textInput: name, event: {focus: $root.clearProperties}">
             </div>
 
@@ -56,9 +56,12 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                     </div>
                 </div>
 
-                <div class="layout-placeholder-placeholders" data-bind="if: placeholders().length > 0">
-                    <div data-bind="template: { name: 'placeholders', data: placeholders }"></div>
-                </div></div>
+                <div data-bind="if: placeholders().length > 0">
+                    <div class="layout-placeholder-placeholders">
+                        <div data-bind="template: { name: 'placeholders', data: placeholders }"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </script>
 </head>
@@ -72,32 +75,50 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
     <table class="layout">
         <tr>
             <td class="layout-renderings">
-                <div data-bind="template: { name: 'placeholders', data: placeholders }"></div>
-                <a href="#" data-bind="click: $root.addRootPlaceholder">Add placeholder</a>
+                <div class="layout-renderings-panel">
+                    <div data-bind="template: { name: 'placeholders', data: placeholders }"></div>
+
+                    <div class="layout-renderings-toolbar">
+                        <a href="#" data-bind="click: $root.addRootPlaceholder">Add placeholder</a>
+                    </div>
+                </div>
             </td>
 
-            <td class="layout-properties" data-bind="with:selectedItem()">
+            <td class="layout-properties">
                 <div class="layout-properties-panel">
-                    <div>
-                        <b><span data-bind="text: renderingName"></span> properties:</b>
+                    <div data-bind="if: !selectedItem()">
+                        <div class="layout-properties-noitems">
+                            There are no properties to show.
+                        </div>
                     </div>
-                    <table data-bind="foreach: parameters">
-                        <tr class="layout-property">
-                            <td>
-                                <input type="text" data-bind="textInput: key">
-                            </td>
-                            <td>
-                                <input type="text" data-bind="textInput: value">
-                            </td>
-                            <td>
-                                <div class="layout-property-toolbar-buttons">
-                                    <a href="#" data-bind="click: $root.removeParameter">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
 
-                    <a href="#" data-bind="click: $root.addParameter">Add property</a>
+                    <div data-bind="with: selectedItem()">
+                        <div class="layout-properties-title">
+                            <b><span data-bind="text: renderingName"></span> properties:</b>
+                        </div>
+
+                        <table class="layout-properties-table" cellpadding="0" cellspacing="0">
+                            <tbody data-bind="foreach: parameters">
+                                <tr class="layout-property">
+                                    <td class="layout-property-toolbar-cell">
+                                        <input type="text" data-bind="textInput: key">
+                                    </td>
+                                    <td class="layout-property-value-cell">
+                                        <input type="text" data-bind="textInput: value">
+                                    </td>
+                                    <td class="layout-property-toolbar-cell">
+                                        <div class="layout-property-toolbar-buttons">
+                                            <a href="#" data-bind="click: $root.removeParameter">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="layout-properties-toolbar">
+                            <a href="#" data-bind="click: $root.addParameter">Add property</a>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -263,6 +284,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                 var rendering = {
                     renderingName: ko.observable("New"),
                     renderingParams: {},
+                    parameters: ko.observableArray(),
                     placeholders: ko.observableArray(),
                     placeholder: placeholder
                 };
@@ -381,24 +403,81 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                 width: 50%;
                 vertical-align: top;
             }
-            .layout-properties {
-                width: 50%;
-                vertical-align: top;
-                padding-left: 16px
-            }
-            .layout-placeholder {
+
+            .layout-renderings-panel {
                 border: 1px solid #666666;
                 background: #252526;
             }
+
+            .layout-renderings-toolbar {
+                margin: 4px 0 0 8px;
+            }
+            .layout-properties {
+                width: 50%;
+                vertical-align: top;
+                padding-left: 8px
+            }
+            .layout-placeholder {
+            }
             .layout-placeholder-indent {
-                padding: 4px 0 4px 0;
             }
             .layout-placeholder-renderings {
-                padding-top: 4px;
             }
             .layout-placeholder-placeholders {
-                padding-top: 2px;
-                padding-left: 48px;
+                margin-left: 48px;
+                border-top: 1px solid #666666;
+                border-left: 1px solid #666666;
+                border-bottom: 1px solid #666666;
+            }
+
+            .layout-properties-panel {
+            }
+
+            .layout-properties-title {
+                padding: 4px;
+                border-bottom: 1px solid #666666;
+            }
+
+            .layout-properties-table {
+                width: 100%;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            .layout-properties-toolbar {
+                padding: 2px 4px;
+                border-top: 1px solid #666666;
+            }
+
+            .layout-properties-table td {
+                margin: 0;
+                padding: 4px;
+            }
+
+            .layout-property-value-cell {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .layout-property-value-cell input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .layout-property-toolbar-cell {
+                width: 150px;
+            }
+
+            .layout-properties-noitems {
+                padding: 4px 8px;
+            }
+
+            .layout-property {
+                padding: 4px;
+            }
+            .layout-property:hover {
+                background: #303030;
             }
 
             .layout-property-toolbar-buttons {
@@ -407,6 +486,12 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
 
             .layout-property:hover .layout-property-toolbar-buttons {
                 display: block;
+                padding: 0 8px;
+            }
+
+            .toolbar {
+                white-space: nowrap;
+                padding: 4px 0;
             }
 
             .toolbar:hover {
@@ -428,7 +513,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
             }
 
             .vscode-dark .layout-properties-panel {
-                border: 1px solid #666666
+                border: 1px solid #666666;
                 background: #252526;
             }
 
