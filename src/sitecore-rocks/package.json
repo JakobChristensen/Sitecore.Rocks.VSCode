@@ -52,8 +52,23 @@
                 "category": "Sitecore"
             },
             {
+                "command": "extension.sitecore.openLayout",
+                "title": "Open Layout",
+                "category": "Sitecore"
+            },
+            {
+                "command": "extension.sitecore.pickRendering",
+                "title": "Pick Rendering",
+                "category": "Sitecore"
+            },
+            {
                 "command": "extension.sitecore.saveItem",
                 "title": "Save",
+                "category": "Sitecore"
+            },
+            {
+                "command": "extension.sitecore.saveLayout",
+                "title": "Save Layout",
                 "category": "Sitecore"
             },
             {
@@ -76,10 +91,17 @@
             ]
         },
         "menus": {
+            "explorer/context": [
+				{
+                    "command": "extension.sitecore.openLayout",
+                    "when": "resourceLangId  == 'json'",
+                    "group": "2_sitecore"
+				}
+            ],
             "editor/title": [
 				{
-					"when": "resourceScheme == sitecore-item",
-					"command": "extension.sitecore.deleteItem"
+					"command": "extension.sitecore.deleteItem",
+					"when": "resourceScheme == sitecore-item"
 				}
             ],
             "view/title": [

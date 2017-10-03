@@ -5,11 +5,11 @@
             "name": "website"
         }
     },
-    "name": "Test",
-    "displayName": "Test",
+    "name": "File",
+    "displayName": "File",
     "fields": {
         "Title": {
-            "value": "test item title",
+            "value": "FILE item title",
             "editable": "test item title"
         },
         "Text": {

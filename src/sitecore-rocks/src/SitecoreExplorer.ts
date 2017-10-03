@@ -10,6 +10,7 @@ import { isDatabaseTreeViewItem } from "./SitecoreExplorer/DatabaseTreeViewItem"
 import { isItemTreeViewItem, ItemTreeViewItem } from "./SitecoreExplorer/ItemTreeViewItem";
 import { TreeViewItem } from "./SitecoreExplorer/TreeViewItem";
 import { QuickPickSitecoreItem } from "./UI/QuickPickSitecoreItem";
+import { WebsiteUri } from "./data/WebsiteUri";
 
 export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> {
     public selectedTreeViewItem: TreeViewItem | undefined;
@@ -258,7 +259,7 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
 
         root.expand(itemUris.slice(1)).then(ok => {
             if (!ok) {
-                vscode.window.showErrorMessage(`Item not found`);
+                vscode.window.showErrorMessage("Item not found");
             }
         });
     }
@@ -276,6 +277,37 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         item.itemUri.websiteUri.connection.saveItems([item]);
     }
 
+    public saveLayout(layout: any) {
+        // todo: change directory
+        const fs = require("fs");
+        fs.writeFile("e:\\layout.json", JSON.stringify(layout, undefined, 4), (error: any) => {
+            if (error) {
+                throw error;
+            }
+        });
+    }
+
+    public openLayout(file: any) {
+        const fs = require("fs");
+
+        fs.readFile(file.fsPath, (error: any, data: any) => {
+            if (error) {
+                return;
+            }
+
+            const model = JSON.parse(data);
+
+            const rocks = (global as any).sitecoreRocks;
+            rocks[file.fsPath] = model;
+
+            const name = model.displayName + " layout";
+
+            const previewUri = vscode.Uri.parse("sitecore-layout://file:/" + file.fsPath);
+
+            return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
+        });
+    }
+
     public selectItem(treeViewItem: TreeViewItem | vscode.Uri | undefined) {
         if (treeViewItem instanceof vscode.Uri) {
             this.selectedTreeViewItem = undefined;
@@ -283,6 +315,25 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         }
 
         this.selectedTreeViewItem = treeViewItem;
+    }
+
+    public pickRendering(key: string) {
+        const websiteUri = WebsiteUri.create("http://pathfinder");
+        const databaseUri = DatabaseUri.create(websiteUri, "master");
+
+        databaseUri.websiteUri.connection.getTemplates(databaseUri).then(templates => {
+            vscode.window.showQuickPick<QuickPickSitecoreItem>(templates.map(t => new QuickPickSitecoreItem(t)), { placeHolder: "Select template of the new item" }).then(templateItem => {
+                const rocks = (global as any).sitecoreRocks;
+                const callback = rocks[key];
+                delete rocks[key];
+
+                if (!templateItem) {
+                    return;
+                }
+
+                callback.pickRenderingCallback(templateItem.item);
+            });
+        });
     }
 
     private saveConnections() {
