@@ -37,8 +37,8 @@
                 "category": "Sitecore"
             },
             {
-                "command": "extension.sitecore.designLayout",
-                "title": "Design Layout",
+                "command": "extension.sitecore.designJssLayout",
+                "title": "Design JSS Layout",
                 "category": "Sitecore"
             },
             {
@@ -52,13 +52,8 @@
                 "category": "Sitecore"
             },
             {
-                "command": "extension.sitecore.openLayout",
-                "title": "Open Layout",
-                "category": "Sitecore"
-            },
-            {
-                "command": "extension.sitecore.pickRendering",
-                "title": "Pick Rendering",
+                "command": "extension.sitecore.openJssLayoutFile",
+                "title": "Design JSS Layout",
                 "category": "Sitecore"
             },
             {
@@ -67,8 +62,8 @@
                 "category": "Sitecore"
             },
             {
-                "command": "extension.sitecore.saveLayout",
-                "title": "Save Layout",
+                "command": "extension.sitecore.saveJssLayout",
+                "title": "Save JSS Layout",
                 "category": "Sitecore"
             },
             {
@@ -93,7 +88,7 @@
         "menus": {
             "explorer/context": [
 				{
-                    "command": "extension.sitecore.openLayout",
+                    "command": "extension.sitecore.openJssLayoutFile",
                     "when": "resourceLangId  == 'json'",
                     "group": "2_sitecore"
 				}
@@ -120,7 +115,7 @@
                     "when": "view == sitecoreExplorer && viewItem == item"
                 },
                 {
-                    "command": "extension.sitecore.designLayout",
+                    "command": "extension.sitecore.designJssLayout",
                     "when": "view == sitecoreExplorer && viewItem == item"
                 },
                 {

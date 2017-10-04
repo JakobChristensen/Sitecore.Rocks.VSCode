@@ -4,13 +4,13 @@ import { DatabaseUri } from "./data/DatabaseUri";
 import { ItemUri } from "./data/ItemUri";
 import { ItemVersionUri } from "./data/ItemVersionUri";
 import { SitecoreConnection } from "./data/SitecoreConnection";
+import { WebsiteUri } from "./data/WebsiteUri";
 import { SitecoreItem } from "./sitecore/SitecoreItem";
 import { ConnectionTreeViewItem, isConnectionTreeViewItem } from "./SitecoreExplorer/ConnectionTreeViewItem";
 import { isDatabaseTreeViewItem } from "./SitecoreExplorer/DatabaseTreeViewItem";
 import { isItemTreeViewItem, ItemTreeViewItem } from "./SitecoreExplorer/ItemTreeViewItem";
 import { TreeViewItem } from "./SitecoreExplorer/TreeViewItem";
 import { QuickPickSitecoreItem } from "./UI/QuickPickSitecoreItem";
-import { WebsiteUri } from "./data/WebsiteUri";
 
 export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> {
     public selectedTreeViewItem: TreeViewItem | undefined;
@@ -158,7 +158,7 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         });
     }
 
-    public designLayout(item: ItemTreeViewItem | vscode.Uri | undefined) {
+    public designJssLayout(item: ItemTreeViewItem | vscode.Uri | undefined) {
         const itemUri = this.getSelectedItemUri(item);
         if (!itemUri) {
             return;
@@ -174,7 +174,7 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
             }
         }
 
-        const previewUri = vscode.Uri.parse("sitecore-layout://" + itemUri.toString());
+        const previewUri = vscode.Uri.parse("sitecore-jss-layout://" + itemUri.toString());
 
         return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
     }
@@ -277,17 +277,22 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         item.itemUri.websiteUri.connection.saveItems([item]);
     }
 
-    public saveLayout(layout: any) {
-        // todo: change directory
-        const fs = require("fs");
-        fs.writeFile("e:\\layout.json", JSON.stringify(layout, undefined, 4), (error: any) => {
-            if (error) {
-                throw error;
-            }
-        });
+    public saveJssLayout(layout: any, uri: string, test: any) {
+        if (uri.substr(0, 28) === "sitecore-jss-layout://file:/") {
+            const fileName = decodeURIComponent(uri.substr(28));
+
+            const fs = require("fs");
+            fs.writeFile(fileName, JSON.stringify(layout, undefined, 4), (error: any) => {
+                if (error) {
+                    throw error;
+                }
+            });
+        } else {
+            // todo: save to web service
+        }
     }
 
-    public openLayout(file: any) {
+    public openJssLayoutFile(file: any) {
         const fs = require("fs");
 
         fs.readFile(file.fsPath, (error: any, data: any) => {
@@ -302,7 +307,7 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
 
             const name = model.displayName + " layout";
 
-            const previewUri = vscode.Uri.parse("sitecore-layout://file:/" + file.fsPath);
+            const previewUri = vscode.Uri.parse("sitecore-jss-layout://file:/" + file.fsPath);
 
             return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
         });
@@ -315,25 +320,6 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         }
 
         this.selectedTreeViewItem = treeViewItem;
-    }
-
-    public pickRendering(key: string) {
-        const websiteUri = WebsiteUri.create("http://pathfinder");
-        const databaseUri = DatabaseUri.create(websiteUri, "master");
-
-        databaseUri.websiteUri.connection.getTemplates(databaseUri).then(templates => {
-            vscode.window.showQuickPick<QuickPickSitecoreItem>(templates.map(t => new QuickPickSitecoreItem(t)), { placeHolder: "Select template of the new item" }).then(templateItem => {
-                const rocks = (global as any).sitecoreRocks;
-                const callback = rocks[key];
-                delete rocks[key];
-
-                if (!templateItem) {
-                    return;
-                }
-
-                callback.pickRenderingCallback(templateItem.item);
-            });
-        });
     }
 
     private saveConnections() {

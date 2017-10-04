@@ -1,110 +1,8 @@
 import * as vscode from "vscode";
-import { ItemUri } from "./data/ItemUri";
-import { SitecoreItem } from "./sitecore/SitecoreItem";
 
-export class LayoutDesignerProvider implements vscode.TextDocumentContentProvider {
-    private onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
+export abstract class LayoutDesigner {
 
-    constructor(public absolutePath: string) {
-    }
-
-    public provideTextDocumentContent(uri: vscode.Uri): vscode.ProviderResult<string> {
-        let model = {
-            context: {
-                pageEditing: false,
-                site: {
-                    name: "website",
-                },
-            },
-            name: "Test",
-            displayName: "Test",
-            fields: {
-                Title: {
-                    value: "test item title",
-                    editable: "test item title",
-                },
-                Text: {
-                    value: "test item text",
-                    editable: "test item text",
-                },
-            },
-            placeholders: [
-                {
-                    name: "main",
-                    path: "main",
-                    elements: [
-                        {
-                            renderingName: "Header",
-                            renderingParams: { Text: "Welcome to Sitecore", Title: "Sitecore" },
-                            uid: "fa0f776f-15bf-4c1b-8fb1-0f6eda37c83c",
-                        },
-                        {
-                            renderingName: "Body",
-                            renderingParams: { Text: "Welcome to Sitecore", Title: "Sitecore" },
-                            uid: "fa0f776f-15bf-4c1b-8fb1-0f6eda37c83b",
-                            placeholders: [
-                                {
-                                    name: "body",
-                                    path: "/main/body",
-                                    elements: [
-                                        {
-                                            renderingName: "Image Component",
-                                            renderingParams: {},
-                                            uid: "60776439-144d-4c9e-ac68-5653502dad47",
-                                            placeholders: [],
-                                            name: "code",
-                                            type: "data/json",
-                                            contents: {
-                                                Image: {
-                                                    value: {
-                                                        src: "/-/media/Experience-Explorer/Presets/Julie-128x128.ashx?h=128&amp;la=en&amp;w=128&amp;hash=2F9EA2943DAC7347510D2FB683222981C28DFE8F",
-                                                        alt: "Julie",
-                                                        width: "128",
-                                                        height: "128",
-                                                    },
-                                                    editable: "",
-                                                },
-                                            },
-                                            attributes: {
-                                                type: "data/json",
-                                            },
-                                        },
-                                    ],
-                                },
-                            ],
-                            name: "code",
-                            type: "data/json",
-                            contents: null,
-                            attributes: {
-                                type: "data/json",
-                            },
-                        },
-                    ],
-                },
-            ],
-        };
-
-        const uriString = uri.toString();
-        if (uriString.substr(0, 24) === "sitecore-layout://file:/") {
-            const rocks = (global as any).sitecoreRocks;
-            const key = decodeURIComponent(uriString.substr(24));
-
-            model = rocks[key];
-            delete rocks[key];
-        } else {
-            // todo: get model from webservice
-        }
-
-        return new Promise((completed, error) => {
-            completed(this.render(model));
-        });
-    }
-
-    public get onDidChange(): vscode.Event<vscode.Uri> {
-        return this.onDidChangeEmitter.event;
-    }
-
-    private render(model: any): string {
+    protected render(model: any, uriString: string): string {
         return `
 <html>
 <head>
@@ -132,7 +30,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                             <a href="#" data-bind="click: $root.addPlaceholder"> Add </a>
                             <a href="#" data-bind="click: $root.removeRendering"> Delete </a>
                         </div>
-                        <span class="rendering">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" data-bind="click: $root.pickRendering">Rendering</a></span>
+                        <span class="rendering">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rendering</span>
                         <input type="text" class="rendering" data-bind="textInput: renderingName, event: {focus: $root.setProperties}">
                     </div>
                 </div>
@@ -148,7 +46,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
 </head>
 <body>
     <div class="menu">
-        <button>Save</button>
+        <a href="#" data-bind="click: $root.saveLayout" title="Ctrl+S">Save</a>
     </div>
 
     <h1>${model.displayName} layout<span data-bind="visible: isModified()">*</span></h1>
@@ -178,6 +76,12 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                             <b><span data-bind="text: renderingName"></span> properties:</b>
                         </div>
 
+                        <div data-bind="if: parameters().length == 0">
+                            <div class="layout-properties-noparameters">
+                                The rendering has no properties.
+                            </div>
+                        </div>
+
                         <table class="layout-properties-table" cellpadding="0" cellspacing="0">
                             <tbody data-bind="foreach: parameters">
                                 <tr class="layout-property">
@@ -204,12 +108,12 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
             </td>
         </tr>
     </table>
-    ${this.renderScript(model)}
+    ${this.renderScript(model, uriString)}
 </body>
 </html>`;
     }
 
-    private renderScript(model: any): string {
+    protected renderScript(model: any, uriString: string): string {
         return `
         <script type="application/javascript">
         (function() {
@@ -219,7 +123,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
             window.onkeyup = function(event) {
                 if (event.keyCode == 83 && event.ctrlKey) {
                     event.preventDefault();
-                    saveItem();
+                    saveLayout();
                     return false;
                 }
             }
@@ -231,6 +135,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                 model.selectedItem = ko.observable();
                 model.clearProperties = clearProperties;
                 model.setProperties = setProperties;
+                model.saveLayout = saveLayout;
                 model.addPlaceholder = addPlaceholder;
                 model.addRootPlaceholder = addRootPlaceholder;
                 model.removePlaceholder = removePlaceholder;
@@ -240,7 +145,6 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                 model.moveRenderingDown = moveRenderingDown;
                 model.addParameter = addParameter;
                 model.removeParameter = removeParameter;
-                model.pickRendering = pickRendering;
 
                 return model;
             }
@@ -335,24 +239,17 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                 parameter.rendering.parameters.splice(index, 1);
             }
 
-            function saveItem() {
+            function saveLayout() {
                 var newModel = Object.assign({}, model);
                 newModel.placeholders = saveModelPlaceholders(newModel);
 
-                let args = { "layout": newModel };
-                let saveLayoutCommand = "command:extension.sitecore.saveLayout?" + encodeURIComponent(JSON.stringify(args));
+                let args = { "layout": newModel, "uri": "${uriString}" };
+                let saveLayoutCommand = "command:extension.sitecore.saveJssLayout?" + encodeURIComponent(JSON.stringify(args));
                 window.parent.postMessage({ command: "did-click-link", data: saveLayoutCommand }, "file://");
             }
 
-            function pickRendering() {
-                global.sitecoreRocks["pickRenderingCallback"] = this;
-                let args = { key: "pickRenderingCallback" };
-                let pickRenderingCommand = "command:extension.sitecore.pickRendering?" + encodeURIComponent(JSON.stringify(args));
-                window.parent.postMessage({ command: "did-click-link", data: pickRenderingCommand }, "file://");
-            }
-
-            function pickRenderingCallback(data) {
-                console.log(data);
+            function test() {
+                console.log("test");
             }
 
             function saveModelPlaceholders(item) {
@@ -405,7 +302,7 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
         `;
     }
 
-    private renderStyles(): string {
+    protected renderStyles(): string {
         return `
         <style>
             body {
@@ -497,6 +394,10 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
                 padding: 4px 8px;
             }
 
+            .layout-properties-noparameters {
+                padding: 4px;
+            }
+
             .layout-property {
                 padding: 4px;
             }
@@ -564,12 +465,6 @@ export class LayoutDesignerProvider implements vscode.TextDocumentContentProvide
             .menu {
                 padding: 4px 0;
                 border-bottom: 1px solid #666666;
-            }
-
-            .menu button {
-                background: transparent;
-                border: none;
-                color: #666666;
             }
         </style>
         `;

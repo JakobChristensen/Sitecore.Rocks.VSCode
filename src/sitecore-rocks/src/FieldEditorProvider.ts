@@ -32,7 +32,12 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
     <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js" type="application/javascript"> </script>
 </head>
 <body>
+    <div class="menu">
+    <a href="#" data-bind="click: $root.saveItem" title="Ctrl+S">Save</a>
+    </div>
+
     <h1>${item.displayName}<span data-bind="visible: isModified()">*</span></h1>
+
     <div>
     ${this.renderFields(item)}
     ${this.renderInformation()}
@@ -62,6 +67,7 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
                 model.isModified = ko.computed(getIsModified, model);
                 model.showInformation = ko.observable(false);
                 model.toggleInformation = toggleInformation;
+                model.saveItem = saveItem;
 
                 return model;
             }
@@ -179,6 +185,18 @@ export class FieldEditorProvider implements vscode.TextDocumentContentProvider {
             }
             a.rotate {
                 transform: translateY(4px) rotate(90deg);
+            }
+
+            .vscode-dark a {
+                color: #cccccc;
+                text-decoration: none;
+            }
+            .vscode-dark a:hover {
+                color: #ffffff;
+            }
+            .menu {
+                padding: 4px 0;
+                border-bottom: 1px solid #666666;
             }
         </style>
         `;
