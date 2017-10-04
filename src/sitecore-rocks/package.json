@@ -57,6 +57,11 @@
                 "category": "Sitecore"
             },
             {
+                "command": "extension.sitecore.pickRendering",
+                "title": "Pick Rendering",
+                "category": "Sitecore"
+            },
+            {
                 "command": "extension.sitecore.saveItem",
                 "title": "Save",
                 "category": "Sitecore"

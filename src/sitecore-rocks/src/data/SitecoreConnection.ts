@@ -106,6 +106,18 @@ export class SitecoreConnection {
         }));
     }
 
+    public getRenderings(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/items/" + databaseUri.databaseName + "?templatename[in]=Sublayout|View rendering|Webcontrol|XmlControl|Xsl Rendering|Method Rendering")).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const renderings = data.items as object[];
+                const items = renderings.map(d => new SitecoreItem(d, this.host));
+
+                completed(items);
+            });
+        }));
+    }
+
     public getInsertOptions(itemUri: ItemUri): Thenable<SitecoreItem[]> {
         return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/insertoptions/" + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
             response.readBody().then(body => {

@@ -264,6 +264,25 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         });
     }
 
+    public pickRendering(uri: string, host: string, databaseName: string) {
+        if (uri.indexOf("://file:/") >= 0) {
+            return;
+        }
+
+        const s = decodeURIComponent(uri.substr(uri.indexOf("://") + 3));
+        const itemUri = ItemUri.parse(s);
+
+        itemUri.databaseUri.websiteUri.connection.getRenderings(itemUri.databaseUri).then(renderings => {
+            vscode.window.showQuickPick<QuickPickSitecoreItem>(renderings.map(t => new QuickPickSitecoreItem(t)), { placeHolder: "Select rendering" }).then(renderingItem => {
+                if (!renderingItem) {
+                    return;
+                }
+
+                vscode.commands.executeCommand("_workbench.htmlPreview.postMessage", uri, { type: "pickRendering", renderingName: renderingItem.item.name });
+            });
+        });
+    }
+
     public refresh(item: TreeViewItem | vscode.Uri | undefined) {
         const selectedItem = item || this.selectedTreeViewItem;
         if (!selectedItem) {
@@ -277,7 +296,7 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         item.itemUri.websiteUri.connection.saveItems([item]);
     }
 
-    public saveJssLayout(layout: any, uri: string, test: any) {
+    public saveJssLayout(layout: any, uri: string) {
         if (uri.substr(0, 28) === "sitecore-jss-layout://file:/") {
             const fileName = decodeURIComponent(uri.substr(28));
 
@@ -287,7 +306,7 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
                     throw error;
                 }
             });
-        } else {
+    } else {
             // todo: save to web service
         }
     }

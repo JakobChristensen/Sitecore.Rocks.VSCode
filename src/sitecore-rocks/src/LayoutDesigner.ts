@@ -25,6 +25,7 @@ export abstract class LayoutDesigner {
                 <div class="layout-placeholder-renderings">
                     <div class="toolbar">
                         <div class="toolbar-buttons">
+                            <a href="#" data-bind="click: $root.pickRendering"> Browse </a>
                             <a href="#" data-bind="click: $root.moveRenderingUp"> Up </a>
                             <a href="#" data-bind="click: $root.moveRenderingDown"> Down </a>
                             <a href="#" data-bind="click: $root.addPlaceholder"> Add </a>
@@ -117,6 +118,8 @@ export abstract class LayoutDesigner {
         return `
         <script type="application/javascript">
         (function() {
+            let currentRendering = undefined;
+
             let model = loadModel(${JSON.stringify(model)});
             ko.applyBindings(model);
 
@@ -127,6 +130,15 @@ export abstract class LayoutDesigner {
                     return false;
                 }
             }
+
+            window.addEventListener("message", (event) => {
+                switch(event.data.type) {
+                    case "pickRendering":
+                        currentRendering.renderingName(event.data.renderingName);
+                        delete currentRendering;
+                        break;
+                }
+            });
 
             function loadModel(model) {
                 loadModelPlaceholders(model);
@@ -145,6 +157,7 @@ export abstract class LayoutDesigner {
                 model.moveRenderingDown = moveRenderingDown;
                 model.addParameter = addParameter;
                 model.removeParameter = removeParameter;
+                model.pickRendering = pickRendering;
 
                 return model;
             }
@@ -239,6 +252,13 @@ export abstract class LayoutDesigner {
                 parameter.rendering.parameters.splice(index, 1);
             }
 
+            function pickRendering(rendering) {
+                currentRendering = rendering;
+                let args = { uri: "${uriString}", host: "http://pathfinder", databaseName: "master" };
+                let pickRenderingCommand = "command:extension.sitecore.pickRendering?" + encodeURIComponent(JSON.stringify(args));
+                window.parent.postMessage({ command: "did-click-link", data: pickRenderingCommand }, "file://");
+            }
+
             function saveLayout() {
                 var newModel = Object.assign({}, model);
                 newModel.placeholders = saveModelPlaceholders(newModel);
@@ -246,10 +266,6 @@ export abstract class LayoutDesigner {
                 let args = { "layout": newModel, "uri": "${uriString}" };
                 let saveLayoutCommand = "command:extension.sitecore.saveJssLayout?" + encodeURIComponent(JSON.stringify(args));
                 window.parent.postMessage({ command: "did-click-link", data: saveLayoutCommand }, "file://");
-            }
-
-            function test() {
-                console.log("test");
             }
 
             function saveModelPlaceholders(item) {
