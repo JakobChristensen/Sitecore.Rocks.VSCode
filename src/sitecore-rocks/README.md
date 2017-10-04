@@ -3,7 +3,7 @@
 Sitecore Rocks VS Code is an extension for Visual Studio Code, that allows developers to connect to Sitecore
 websites and edit items.
 
-![Sitecore Rocks Visual Studio Code](docs/SitecoreRocksVSCode-CRUD.gif)
+![Sitecore Rocks VS Code](./docs/SitecoreRocksVSCode-CRUD.gif)
 
 ## Features
 

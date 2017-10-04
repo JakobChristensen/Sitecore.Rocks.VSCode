@@ -2,6 +2,14 @@
     "name": "sitecore-rocks-vscode",
     "displayName": "Sitecore Rocks VS Code",
     "description": "Sitecore Rocks VS Code",
+    "author": {
+        "name": "Jakob Christensen"
+    },
+    "icon": "./docs/icon.png",
+    "keywords": [
+        "sitecore"
+    ],
+    "license": "MIT",
     "version": "0.0.4",
     "publisher": "refactor11",
     "engines": {
@@ -11,7 +19,9 @@
         "Other"
     ],
     "activationEvents": [
-        "onView:sitecoreExplorer"
+        "onView:sitecoreExplorer",
+        "onCommand:extension.sitecore.openJssLayoutFile",
+        "onCommand:extension.sitecore.addConnection"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -54,26 +64,6 @@
             {
                 "command": "extension.sitecore.openJssLayoutFile",
                 "title": "Design JSS Layout",
-                "category": "Sitecore"
-            },
-            {
-                "command": "extension.sitecore.pickRendering",
-                "title": "Pick Rendering",
-                "category": "Sitecore"
-            },
-            {
-                "command": "extension.sitecore.saveItem",
-                "title": "Save",
-                "category": "Sitecore"
-            },
-            {
-                "command": "extension.sitecore.saveJssLayout",
-                "title": "Save JSS Layout",
-                "category": "Sitecore"
-            },
-            {
-                "command": "extension.sitecore.selectItem",
-                "title": "[Internal] Select Item",
                 "category": "Sitecore"
             },
             {
