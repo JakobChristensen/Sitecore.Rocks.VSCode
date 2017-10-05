@@ -47,6 +47,11 @@
                 "category": "Sitecore"
             },
             {
+                "command": "extension.sitecore.designLayout",
+                "title": "Design Layout",
+                "category": "Sitecore"
+            },
+            {
                 "command": "extension.sitecore.designJssLayout",
                 "title": "Design JSS Layout",
                 "category": "Sitecore"
@@ -107,6 +112,10 @@
                 },
                 {
                     "command": "extension.sitecore.deleteItem",
+                    "when": "view == sitecoreExplorer && viewItem == item"
+                },
+                {
+                    "command": "extension.sitecore.designLayout",
                     "when": "view == sitecoreExplorer && viewItem == item"
                 },
                 {

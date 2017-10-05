@@ -158,6 +158,27 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         });
     }
 
+    public designLayout(item: ItemTreeViewItem | vscode.Uri | undefined) {
+        const itemUri = this.getSelectedItemUri(item);
+        if (!itemUri) {
+            return;
+        }
+
+        let name = "Layout";
+        if (item instanceof ItemTreeViewItem) {
+            name = item.item.displayName + " layout";
+        } else {
+            const t = this.find(itemUri.toString());
+            if (t) {
+                name = t.treeItem.label + " layout";
+            }
+        }
+
+        const previewUri = vscode.Uri.parse("sitecore-layout://" + itemUri.toString());
+
+        return vscode.commands.executeCommand("vscode.previewHtml", previewUri, undefined, name).then((success) => undefined, (reason) => vscode.window.showErrorMessage(reason));
+    }
+
     public designJssLayout(item: ItemTreeViewItem | vscode.Uri | undefined) {
         const itemUri = this.getSelectedItemUri(item);
         if (!itemUri) {

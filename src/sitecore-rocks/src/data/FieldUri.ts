@@ -1,5 +1,8 @@
+import { DatabaseUri } from "./DatabaseUri";
 import { isString } from "./helpers";
-import { DatabaseUri, ItemUri, ItemVersionUri, WebsiteUri } from "./index";
+import { ItemUri } from "./ItemUri";
+import { ItemVersionUri } from "./ItemVersionUri";
+import { WebsiteUri } from "./WebsiteUri";
 
 export class FieldUri {
     public static readonly empty = new FieldUri(ItemVersionUri.empty, "{00000000-0000-0000-0000-000000000000}");

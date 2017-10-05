@@ -2,6 +2,7 @@ import { HttpClient } from "typed-rest-client/HttpClient";
 import * as vscode from "vscode";
 import { SitecoreItem } from "../sitecore/SitecoreItem";
 import { DatabaseUri } from "./DatabaseUri";
+import { ItemVersionUri } from "./index";
 import { ItemUri } from "./ItemUri";
 import { WebsiteUri } from "./WebsiteUri";
 
@@ -86,6 +87,16 @@ export class SitecoreConnection {
     public getItem(itemUri: ItemUri): Thenable<SitecoreItem> {
         return new Promise((completed, error) =>
             this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true&emptyfields=true")).then(response => {
+                response.readBody().then(body => {
+                    const data = JSON.parse(body);
+                    completed(new SitecoreItem(data, this.host));
+                });
+            }));
+    }
+
+    public getLayout(itemVersionUri: ItemVersionUri): Thenable<SitecoreItem> {
+        return new Promise((completed, error) =>
+            this.client.get(this.getUrl("/sitecore/get/item/" + itemVersionUri.itemUri.databaseUri.databaseName + "/" + itemVersionUri.itemUri.id + "?fields=__Renderings[json-layout]&fieldinfo=true")).then(response => {
                 response.readBody().then(body => {
                     const data = JSON.parse(body);
                     completed(new SitecoreItem(data, this.host));
