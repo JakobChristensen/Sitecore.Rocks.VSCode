@@ -7,6 +7,8 @@ import { WebsiteUri } from "./WebsiteUri";
 
 export class SitecoreConnection {
 
+    public static readonly expectedWebserviceVersion = "1.0.1";
+
     public static readonly empty = new SitecoreConnection("", "", "");
 
     public static create(host: string, userName: string, password: string): SitecoreConnection {
@@ -67,6 +69,15 @@ export class SitecoreConnection {
         return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/databases")).then(response => {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
+
+                if (!this.compareVersions(SitecoreConnection.expectedWebserviceVersion, data.metadata.version)) {
+                    vscode.window.showWarningMessage("Please upgrade to latest the Sitecore webservice version", "Download package").then((button: string) => {
+                        if (button === "Download package") {
+                            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse("https://ci.appveyor.com/project/JakobChristensen/sitecore-contentdelivery/build/artifacts"));
+                        }
+                    });
+                }
+
                 completed(data.databases);
             }).catch(reason => this.handleError(reason, error));
         }).catch(reason => this.handleError(reason, error)));
@@ -177,5 +188,30 @@ export class SitecoreConnection {
         });
 
         error();
+    }
+
+    private compareVersions(expectedVersion: string, actualVersion: string): boolean {
+        const v1 = expectedVersion.split(".");
+        const v2 = actualVersion.split(".");
+
+        const major1 = parseInt(v1[0], 10);
+        const major2 = parseInt(v2[0], 10);
+        if (major2 > major1) {
+            return true;
+        }
+
+        const minor1 = parseInt(v1[1], 10);
+        const minor2 = parseInt(v2[1], 10);
+        if (major2 === major1 && minor2 > minor1) {
+            return true;
+        }
+
+        const patch1 = parseInt(v1[2], 10);
+        const patch2 = parseInt(v2[2], 10);
+        if (major2 === major1 && minor2 === minor1 && patch2 >= patch1) {
+            return true;
+        }
+
+        return false;
     }
 }
