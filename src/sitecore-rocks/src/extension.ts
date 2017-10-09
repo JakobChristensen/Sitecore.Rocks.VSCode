@@ -38,6 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("extension.sitecore.navigateTemplate", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.navigateTemplate(item));
     vscode.commands.registerCommand("extension.sitecore.openJssLayoutFile", (file: any) => sitecoreExplorer.openJssLayoutFile(file));
     vscode.commands.registerCommand("extension.sitecore.pickRendering", (args: { uri: string, host: string, databaseName: string }) => sitecoreExplorer.pickRendering(args.uri, args.host, args.databaseName));
+    vscode.commands.registerCommand("extension.sitecore.pickLayout", (args: { uri: string, host: string, databaseName: string }) => sitecoreExplorer.pickLayout(args.uri, args.host, args.databaseName));
     vscode.commands.registerCommand("extension.sitecore.refresh", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.refresh(item));
     vscode.commands.registerCommand("extension.sitecore.removeConnection", (connectionTreeViewItem: ConnectionTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.removeConnection(connectionTreeViewItem));
     vscode.commands.registerCommand("extension.sitecore.saveItem", (args: { data: any, host: string }) => sitecoreExplorer.saveItem(new SitecoreItem(args.data, args.host, false)));

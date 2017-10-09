@@ -84,6 +84,18 @@ export class SitecoreConnection {
         }).catch(reason => this.handleError(reason, error)));
     }
 
+    public getInsertOptions(itemUri: ItemUri): Thenable<SitecoreItem[]> {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/insertoptions/" + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const items = data.items as object[];
+                const insertOptions = items.map(d => new SitecoreItem(d, this.host));
+
+                completed(insertOptions);
+            });
+        }));
+    }
+
     public getItem(itemUri: ItemUri): Thenable<SitecoreItem> {
         return new Promise((completed, error) =>
             this.client.get(this.getUrl("/sitecore/get/item/" + itemUri.databaseUri.databaseName + "/" + itemUri.id + "?fields=*&fieldinfo=true&emptyfields=true")).then(response => {
@@ -102,6 +114,18 @@ export class SitecoreConnection {
                     completed(new SitecoreItem(data, this.host));
                 });
             }));
+    }
+
+    public getLayouts(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
+        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/items/" + databaseUri.databaseName + "?templatename=Layout")).then(response => {
+            response.readBody().then(body => {
+                const data = JSON.parse(body);
+                const layouts = data.items as object[];
+                const items = layouts.map(d => new SitecoreItem(d, this.host));
+
+                completed(items);
+            });
+        }));
     }
 
     public getRoots(databaseUri: DatabaseUri): Thenable<SitecoreItem[]> {
@@ -139,19 +163,6 @@ export class SitecoreConnection {
             });
         }));
     }
-
-    public getInsertOptions(itemUri: ItemUri): Thenable<SitecoreItem[]> {
-        return new Promise((completed, error) => this.client.get(this.getUrl("/sitecore/get/insertoptions/" + itemUri.databaseUri.databaseName + "/" + itemUri.id)).then(response => {
-            response.readBody().then(body => {
-                const data = JSON.parse(body);
-                const items = data.items as object[];
-                const insertOptions = items.map(d => new SitecoreItem(d, this.host));
-
-                completed(insertOptions);
-            });
-        }));
-    }
-
     public saveItems(items: SitecoreItem[]): Thenable<void> {
         let data = "";
         let databaseName = "";

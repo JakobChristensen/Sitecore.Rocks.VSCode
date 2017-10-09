@@ -299,7 +299,26 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
                     return;
                 }
 
-                vscode.commands.executeCommand("_workbench.htmlPreview.postMessage", uri, { type: "pickRendering", renderingName: renderingItem.item.name });
+                vscode.commands.executeCommand("_workbench.htmlPreview.postMessage", uri, { type: "pickRendering", rendering: renderingItem.item, renderingName: renderingItem.item.name });
+            });
+        });
+    }
+
+    public pickLayout(uri: string, host: string, databaseName: string) {
+        if (uri.indexOf("://file:/") >= 0) {
+            return;
+        }
+
+        const s = decodeURIComponent(uri.substr(uri.indexOf("://") + 3));
+        const itemUri = ItemUri.parse(s);
+
+        itemUri.databaseUri.websiteUri.connection.getLayouts(itemUri.databaseUri).then(layouts => {
+            vscode.window.showQuickPick<QuickPickSitecoreItem>(layouts.map(t => new QuickPickSitecoreItem(t)), { placeHolder: "Select layout" }).then(layoutItem => {
+                if (!layoutItem) {
+                    return;
+                }
+
+                vscode.commands.executeCommand("_workbench.htmlPreview.postMessage", uri, { type: "pickLayout", layout: layoutItem.item, layoutName: layoutItem.item.name });
             });
         });
     }

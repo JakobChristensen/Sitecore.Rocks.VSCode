@@ -85,6 +85,27 @@ export abstract class LayoutDesigner {
                 padding: 0 8px;
             }
 
+            .dropdown-menu {
+                display: none;
+            }
+            .dropdown:hover .dropdown-menu {
+                border: 1px solid #999999;
+                background: #383838;
+                position: absolute;
+                display: block;
+            }
+            .dropdown-menu a {
+                text-decoration: none;
+                display: block;
+                padding: 4px 8px;
+            }
+            .dropdown-menu a:hover {
+                background: #666666;
+            }
+            .dropdown-glyph {
+                cursor: pointer;
+            }
+
             .vscode-dark input {
                 background: transparent;
                 color: #cccccc;
@@ -112,8 +133,30 @@ export abstract class LayoutDesigner {
                 background: #252526;
             }
 
+            .layout-renderings-panel th {
+                text-align: left;
+            }
+
+            .layout-renderings-devices {
+                padding-bottom: 24px;
+            }
+            .layout-renderings-device {
+                padding: 8px 8px 8px 4px;
+                font-size: 20px;
+            }
+            .layout-renderings-device-layout {
+                padding: 0px 0px 4px 4px;
+            }
+            .layout-renderings-device-layout-toolbar {
+                display: none;
+            }
+
+            .layout-renderings-device-layout:hover .layout-renderings-device-layout-toolbar {
+                display: inline;
+            }
+
             .layout-renderings-toolbar {
-                margin: 4px 0 0 8px;
+                margin: 4px 0 0 4px;
             }
             .layout-properties {
                 width: 50%;

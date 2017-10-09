@@ -5,12 +5,12 @@
     "author": {
         "name": "Jakob Christensen"
     },
-    "icon": "./docs/icon.png",
+    "icon": "docs/Icon.png",
     "keywords": [
         "sitecore"
     ],
     "license": "MIT",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "publisher": "refactor11",
     "engines": {
         "vscode": "^1.15.0"

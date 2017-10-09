@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Webservice version check
+- Design layout work in progress
 
 ## [0.0.4] - 2017-10-04
 ### Added

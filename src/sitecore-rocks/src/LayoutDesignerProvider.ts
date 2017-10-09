@@ -43,43 +43,9 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
 <html>
 <head>
     <base href="">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     ${this.renderStyles()}
     <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js" type="application/javascript"> </script>
-
-    <script type="text/html" id="placeholders">
-        <div class="layout-placeholder" data-bind="foreach: $data">
-            <div class="toolbar">
-                <div class="toolbar-buttons">
-                    <a href="#" data-bind="click: $root.addRendering"> Add </a>
-                    <a href="#" data-bind="click: $root.removePlaceholder"> Delete </a>
-                </div>
-                <span class="placeholder">&nbsp;&nbsp;Placeholder</span>
-                <input type="text" class="placeholder" data-bind="textInput: name, event: {focus: $root.clearProperties}">
-            </div>
-
-            <div class="layout-placeholder-indent" data-bind="foreach: elements">
-                <div class="layout-placeholder-renderings">
-                    <div class="toolbar">
-                        <div class="toolbar-buttons">
-                            <a href="#" data-bind="click: $root.pickRendering"> Browse </a>
-                            <a href="#" data-bind="click: $root.moveRenderingUp"> Up </a>
-                            <a href="#" data-bind="click: $root.moveRenderingDown"> Down </a>
-                            <a href="#" data-bind="click: $root.addPlaceholder"> Add </a>
-                            <a href="#" data-bind="click: $root.removeRendering"> Delete </a>
-                        </div>
-                        <span class="rendering">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rendering</span>
-                        <input type="text" class="rendering" data-bind="textInput: renderingName, event: {focus: $root.setProperties}">
-                    </div>
-                </div>
-
-                <div data-bind="if: placeholders().length > 0">
-                    <div class="layout-placeholder-placeholders">
-                        <div data-bind="template: { name: 'placeholders', data: placeholders }"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </script>
 </head>
 <body>
     <div class="menu">
@@ -93,33 +59,46 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
             <td class="layout-renderings">
                 <div class="layout-renderings-panel">
                     <div data-bind="foreach: layout">
-                        <div>
-                            &nbsp;<strong><span data-bind="text: deviceName"></span> device</strong>
-                        </div>
+                        <div class="layout-renderings-devices">
+                            <div class="layout-renderings-device">
+                                <span data-bind="text: deviceName"></span> device
+                            </div>
 
-                        <table cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td>&nbsp;Rendering</td>
-                                <td>Placeholder</td>
-                                <td>Data Source</td>
-                            </tr>
-                            <tbody data-bind="foreach: renderings">
-                                <tr class="table-row-hover">
-                                    <td><input type="text" data-bind="textInput: renderingName"></td>
-                                    <td><input type="text" data-bind="textInput: placeholder"></td>
-                                    <td><input type="text" data-bind="textInput: datasource"></td>
-                                    <td class="table-row-toolbar-cell">
-                                        <div class="table-row-toolbar-cell-buttons">
-                                            <a href="#" data-bind="click: $root.removeParameter">Browse</a>
-                                            <a href="#" data-bind="click: $root.removeParameter">Delete</a>
-                                        </div>
-                                    </td>
+                            <div class="layout-renderings-device-layout">
+                                Layout: <input type="text" data-bind="textInput: layoutName, event: {focus: $root.clearProperties}"> <a class="layout-renderings-device-layout-toolbar" href="#" data-bind="click: $root.pickLayout">Browse</a>
+                            </div>
+
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <th>&nbsp;Rendering</th>
+                                    <th>Placeholder</th>
+                                    <th>Data Source</th>
                                 </tr>
-                            </tbody>
-                        </table>
+                                <tbody data-bind="foreach: renderings">
+                                    <tr class="table-row-hover">
+                                        <td><input type="text" data-bind="textInput: renderingName, event: {focus: $root.setProperties}"></td>
+                                        <td><input type="text" data-bind="textInput: placeholder, event: {focus: $root.setProperties}"></td>
+                                        <td><input type="text" data-bind="textInput: datasource, event: {focus: $root.setProperties}"></td>
+                                        <td class="table-row-toolbar-cell">
+                                            <div class="table-row-toolbar-cell-buttons">
+                                                <div class="dropdown">
+                                                    <div class="dropdown-glyph">Actions</div>
+                                                    <div class="dropdown-menu">
+                                                        <a href="#" data-bind="click: $root.pickRendering">Browse Rendering</a>
+                                                        <a href="#" data-bind="click: $root.moveRenderingUp">Move Up</a>
+                                                        <a href="#" data-bind="click: $root.moveRenderingDown">Move Down</a>
+                                                        <a href="#" data-bind="click: $root.removeRendering">Delete</a>
+                                                    </div>
+                                                </div
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-                        <div class="layout-renderings-toolbar">
-                            <a href="#" data-bind="click: $root.addRendering">Add Rendering</a>
+                            <div class="layout-renderings-toolbar">
+                                <a href="#" data-bind="click: $root.addRendering"><i class="fa fa-plus"></i> Add Rendering</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -154,6 +133,10 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
                     case "pickRendering":
                         currentRendering.renderingName(event.data.renderingName);
                         delete currentRendering;
+                        break;
+                    case "pickLayout":
+                        currentDevice.layoutName(event.data.layoutName);
+                        delete currentDevice;
                         break;
                 }
             });
@@ -212,6 +195,7 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
                 model.addParameter = addParameter;
                 model.removeParameter = removeParameter;
                 model.pickRendering = pickRendering;
+                model.pickLayout = pickLayout;
 
                 return model;
             }
@@ -263,6 +247,13 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
                 let args = { uri: "${editorUri.toString()}", host: "${item.itemUri.websiteUri.connection.host}", databaseName: "${item.itemUri.databaseUri.databaseName}" };
                 let pickRenderingCommand = "command:extension.sitecore.pickRendering?" + encodeURIComponent(JSON.stringify(args));
                 window.parent.postMessage({ command: "did-click-link", data: pickRenderingCommand }, "file://");
+            }
+
+            function pickLayout(device) {
+                currentDevice = device;
+                let args = { uri: "${editorUri.toString()}", host: "${item.itemUri.websiteUri.connection.host}", databaseName: "${item.itemUri.databaseUri.databaseName}" };
+                let pickLayoutCommand = "command:extension.sitecore.pickLayout?" + encodeURIComponent(JSON.stringify(args));
+                window.parent.postMessage({ command: "did-click-link", data: pickLayoutCommand }, "file://");
             }
 
             function saveLayout() {
