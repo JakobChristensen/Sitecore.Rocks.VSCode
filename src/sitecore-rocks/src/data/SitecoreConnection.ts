@@ -2,13 +2,14 @@ import { HttpClient } from "typed-rest-client/HttpClient";
 import * as vscode from "vscode";
 import { SitecoreItem } from "../sitecore/SitecoreItem";
 import { DatabaseUri } from "./DatabaseUri";
+import { FieldUri } from "./FieldUri";
 import { ItemVersionUri } from "./index";
 import { ItemUri } from "./ItemUri";
 import { WebsiteUri } from "./WebsiteUri";
 
 export class SitecoreConnection {
 
-    public static readonly expectedWebserviceVersion = "1.0.1";
+    public static readonly expectedWebserviceVersion = "1.0.2";
 
     public static readonly empty = new SitecoreConnection("", "", "");
 
@@ -59,7 +60,7 @@ export class SitecoreConnection {
             response.readBody().then(body => {
                 const data = JSON.parse(body);
                 const children = data.children as object[];
-                const items = children.map(d => new SitecoreItem(d, this.host));
+                const items = children ? children.map(d => new SitecoreItem(d, this.host)) : [];
 
                 completed(items);
             });
@@ -163,6 +164,7 @@ export class SitecoreConnection {
             });
         }));
     }
+
     public saveItems(items: SitecoreItem[]): Thenable<void> {
         let data = "";
         let databaseName = "";
@@ -193,6 +195,19 @@ export class SitecoreConnection {
                     item.saved();
                 }
 
+                completed();
+            });
+        }));
+    }
+
+    public saveLayout(fieldUri: FieldUri, layout: any): Thenable<void> {
+        const data = fieldUri.toFieldUri() + "=" + encodeURIComponent(JSON.stringify(layout));
+        const headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+        };
+
+        return new Promise((completed, error) => this.client.post(this.getUrl("/sitecore/put/items/" + fieldUri.databaseUri.databaseName), data, headers).then(response => {
+            response.readBody().then(body => {
                 completed();
             });
         }));

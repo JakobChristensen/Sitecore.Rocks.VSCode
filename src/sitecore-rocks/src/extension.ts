@@ -42,7 +42,8 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("extension.sitecore.refresh", (item: ItemTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.refresh(item));
     vscode.commands.registerCommand("extension.sitecore.removeConnection", (connectionTreeViewItem: ConnectionTreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.removeConnection(connectionTreeViewItem));
     vscode.commands.registerCommand("extension.sitecore.saveItem", (args: { data: any, host: string }) => sitecoreExplorer.saveItem(new SitecoreItem(args.data, args.host, false)));
-    vscode.commands.registerCommand("extension.sitecore.saveJssLayout", (args: { layout: any, uri: string }) => sitecoreExplorer.saveJssLayout(args.layout, args.uri));
+    vscode.commands.registerCommand("extension.sitecore.saveLayout", (args: { layout: any, uri: string }) => sitecoreExplorer.saveLayout(args.uri, args.layout));
+    vscode.commands.registerCommand("extension.sitecore.saveJssLayout", (args: { layout: any, uri: string }) => sitecoreExplorer.saveJssLayout(args.uri, args.layout));
     vscode.commands.registerCommand("extension.sitecore.selectItem", (treeViewItem: TreeViewItem | vscode.Uri | undefined) => sitecoreExplorer.selectItem(treeViewItem));
 }
 

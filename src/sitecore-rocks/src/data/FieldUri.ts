@@ -67,6 +67,10 @@ export class FieldUri {
     public toString() {
         return this.itemVersionUri.toString() + "/" + this.fieldId;
     }
+
+    public toFieldUri() {
+        return this.databaseUri.databaseName + "/" + this.itemUri.id + "/" + this.itemVersionUri.language + "/" + this.itemVersionUri.version + "/" + this.fieldId;
+    }
 }
 
 export function isFieldUri(a: any): a is FieldUri {

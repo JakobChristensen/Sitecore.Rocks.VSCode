@@ -117,7 +117,7 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
         (function() {
             let currentRendering = undefined;
 
-            let model = loadModel(${JSON.stringify(item)});
+            let model = loadLayout(${JSON.stringify(item)});
             ko.applyBindings(model);
 
             window.onkeyup = function(event) {
@@ -141,7 +141,7 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
                 }
             });
 
-            function loadModel(model) {
+            function loadLayout(model) {
                 model.layout = ko.observableArray();
 
                 let layout = JSON.parse(model.fields[0].value);
@@ -165,7 +165,7 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
                             device: device
                         };
 
-                        if (r.renderings) {
+                        if (r.parameters) {
                             for (let p of r.parameters) {
                                 var parameter = {
                                     key: ko.observable(p.key),
@@ -257,6 +257,46 @@ export class LayoutDesignerProvider extends LayoutDesigner implements vscode.Tex
             }
 
             function saveLayout() {
+                var layout = {
+                    devices: []
+                };
+
+                for (let d of model.layout()) {
+                    var device = {
+                        deviceId: d.deviceId(),
+                        deviceName: d.deviceName(),
+                        layoutId: d.layoutId(),
+                        layoutName: d.layoutName(),
+                        renderings: []
+                    };
+
+                    for (let r of d.renderings()) {
+                        var rendering = {
+                            renderingName: r.renderingName(),
+                            renderingId: r.renderingId(),
+                            placeholder: r.placeholder(),
+                            datasource: r.datasource(),
+                            parameters: []
+                        }
+
+                        for (var p of r.parameters()) {
+                            var parameter = {
+                                key: p.key(),
+                                value: p.value()
+                            }
+
+                            rendering.parameters.push(parameter);
+                        }
+
+                        device.renderings.push(rendering);
+                    }
+
+                    layout.devices.push(device);
+                }
+
+                let args = { "uri": "${item.itemUri.websiteUri.connection.host}/" + model.fields[0].uri, "layout": layout };
+                let data = "command:extension.sitecore.saveLayout?" + encodeURIComponent(JSON.stringify(args));
+                window.parent.postMessage({ command: "did-click-link", data: data }, "file://");
             }
 
             function getIsModified() {

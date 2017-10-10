@@ -1,6 +1,7 @@
 import { CancellationToken, commands, Event, EventEmitter, ExtensionContext, ProviderResult, TextDocumentContentProvider, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, window, workspace } from "vscode";
 import * as vscode from "vscode";
 import { DatabaseUri } from "./data/DatabaseUri";
+import { FieldUri } from "./data/index";
 import { ItemUri } from "./data/ItemUri";
 import { ItemVersionUri } from "./data/ItemVersionUri";
 import { SitecoreConnection } from "./data/SitecoreConnection";
@@ -336,7 +337,12 @@ export class SitecoreExplorerProvider implements TreeDataProvider<TreeViewItem> 
         item.itemUri.websiteUri.connection.saveItems([item]);
     }
 
-    public saveJssLayout(layout: any, uri: string) {
+    public saveLayout(uri: string, layout: any) {
+        const fieldUri = FieldUri.parse(uri);
+        fieldUri.itemUri.websiteUri.connection.saveLayout(fieldUri, layout);
+    }
+
+    public saveJssLayout(uri: string, layout: any) {
         if (uri.substr(0, 28) === "sitecore-jss-layout://file:/") {
             const fileName = decodeURIComponent(uri.substr(28));
 
