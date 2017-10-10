@@ -1,6 +1,10 @@
 # Change Log
 
-## [Unreleased]
+## [0.0.6] - 2017-10-10
+### Added
+- Save layout works
+
+## [0.0.5] - 2017-10-08
 ### Added
 - Webservice version check
 - Design layout work in progress
